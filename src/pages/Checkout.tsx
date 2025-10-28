@@ -95,7 +95,6 @@ const Checkout = () => {
         customer_email: formData.customerEmail,
         payment_method: formData.paymentMethod,
         total_price: product.price,
-        status: 'unpaid',
       });
 
       if (error) throw error;
