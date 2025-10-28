@@ -33,7 +33,8 @@ const Shop = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [copied, setCopied] = useState(false);
-  const { user, loading } = useAuth();
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const { user } = useAuth();
   const navigate = useNavigate();
   
   const serverIP = 'build-mc.fun';
@@ -66,6 +67,7 @@ const Shop = () => {
   };
 
   const fetchProducts = async () => {
+    setIsLoadingProducts(true);
     const { data, error } = await supabase
       .from('products')
       .select('*')
@@ -74,6 +76,7 @@ const Shop = () => {
     if (!error && data) {
       setProducts(data);
     }
+    setIsLoadingProducts(false);
   };
 
   const filteredProducts = selectedCategory === 'all'
@@ -170,7 +173,7 @@ const Shop = () => {
           </TabsList>
 
           <TabsContent value={selectedCategory} className="space-y-8">
-            {loading ? (
+            {isLoadingProducts ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <ProductCardSkeleton key={i} />
