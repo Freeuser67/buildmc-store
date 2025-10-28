@@ -147,7 +147,7 @@ const Checkout = () => {
               </div>
               <div className="flex justify-between items-center pt-4 border-t">
                 <span className="text-lg">Total</span>
-                <span className="text-3xl font-bold text-primary">${product.price}</span>
+                <span className="text-3xl font-bold text-primary">৳{product.price} BDT</span>
               </div>
             </CardContent>
           </Card>
@@ -183,7 +183,7 @@ const Checkout = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="customerPhone">Phone Number *</Label>
+                  <Label htmlFor="customerPhone">Phone Number (The number from which you sent the money) *</Label>
                   <Input
                     id="customerPhone"
                     type="tel"
@@ -213,10 +213,7 @@ const Checkout = () => {
                       <SelectValue placeholder="Select payment method" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="paypal">PayPal</SelectItem>
-                      <SelectItem value="venmo">Venmo</SelectItem>
-                      <SelectItem value="cashapp">Cash App</SelectItem>
-                      <SelectItem value="zelle">Zelle</SelectItem>
+                      <SelectItem value="bkash">bKash</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.paymentMethod && <p className="text-sm text-destructive">{errors.paymentMethod}</p>}
