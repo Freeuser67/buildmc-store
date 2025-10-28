@@ -176,6 +176,366 @@ The store uses **bKash** as the payment method. Customers need to:
 3. Follow the DNS configuration instructions
 4. Note: Requires a paid Lovable plan
 
+### VPS Deployment with Node.js
+
+Deploy your BuildMC Store on any VPS (DigitalOcean, AWS, Linode, etc.) using Node.js and PM2.
+
+#### Prerequisites
+- Ubuntu 20.04+ VPS with root access
+- Domain name (optional but recommended)
+- SSH access
+
+#### Step 1: Initial VPS Setup
+
+```bash
+# Connect to your VPS
+ssh root@your-vps-ip
+
+# Update system
+apt update && apt upgrade -y
+
+# Install Node.js 18+
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+apt install -y nodejs
+
+# Install Git
+apt install -y git
+
+# Verify installations
+node --version
+npm --version
+```
+
+#### Step 2: Install Nginx (Reverse Proxy)
+
+```bash
+# Install Nginx
+apt install -y nginx
+
+# Start and enable Nginx
+systemctl start nginx
+systemctl enable nginx
+```
+
+#### Step 3: Configure Firewall
+
+```bash
+# Allow necessary ports
+ufw allow 22/tcp      # SSH
+ufw allow 80/tcp      # HTTP
+ufw allow 443/tcp     # HTTPS
+ufw enable
+```
+
+#### Step 4: Setup Application
+
+```bash
+# Create app directory
+mkdir -p /var/www/buildmc
+cd /var/www/buildmc
+
+# Clone repository (or upload via FTP/SCP)
+git clone YOUR_GITHUB_REPO_URL .
+
+# Create environment file
+cat > .env << 'EOF'
+VITE_SUPABASE_PROJECT_ID="bcwsvxgkbgrfwkaekblc"
+VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjd3N2eGdrYmdyZndrYWVrYmxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MTM2OTgsImV4cCI6MjA3NzE4OTY5OH0.ErTCmBzVa8l3mneHK5PtYgtxtYkIoUEFFFxTKvzArcg"
+VITE_SUPABASE_URL="https://bcwsvxgkbgrfwkaekblc.supabase.co"
+PORT=3000
+EOF
+
+# Install dependencies
+npm install
+
+# Build production bundle
+npm run build
+```
+
+#### Step 5: Create Node.js Server
+
+```bash
+# Create server file
+cat > server.js << 'EOF'
+const express = require('express');
+const path = require('path');
+const compression = require('compression');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Enable gzip compression
+app.use(compression());
+
+// Serve static files with caching
+app.use(express.static(path.join(__dirname, 'dist'), {
+  maxAge: '1y',
+  etag: true
+}));
+
+// SPA fallback - all routes serve index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+app.listen(PORT, () => {
+  console.log(`BuildMC Store running on port ${PORT}`);
+});
+EOF
+
+# Install Express and compression
+npm install express compression
+```
+
+#### Step 6: Setup PM2 (Process Manager)
+
+```bash
+# Install PM2 globally
+npm install -g pm2
+
+# Start application with PM2
+pm2 start server.js --name buildmc-store
+
+# Save PM2 configuration
+pm2 save
+
+# Setup PM2 to start on boot
+pm2 startup
+# Follow the command output instructions
+
+# Check status
+pm2 status
+pm2 logs buildmc-store
+```
+
+#### Step 7: Configure Nginx Reverse Proxy
+
+```bash
+# Create Nginx configuration
+cat > /etc/nginx/sites-available/buildmc << 'EOF'
+server {
+    listen 80;
+    server_name your-domain.com www.your-domain.com;  # Replace with your domain
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+}
+EOF
+
+# Enable site
+ln -s /etc/nginx/sites-available/buildmc /etc/nginx/sites-enabled/
+
+# Remove default site
+rm /etc/nginx/sites-enabled/default
+
+# Test Nginx configuration
+nginx -t
+
+# Restart Nginx
+systemctl restart nginx
+```
+
+#### Step 8: Setup SSL Certificate (HTTPS)
+
+```bash
+# Install Certbot
+apt install -y certbot python3-certbot-nginx
+
+# Obtain SSL certificate
+certbot --nginx -d your-domain.com -d www.your-domain.com
+
+# Follow prompts - choose redirect HTTP to HTTPS
+
+# Verify auto-renewal
+certbot renew --dry-run
+```
+
+#### Step 9: Create Deployment Script
+
+```bash
+# Create deployment script
+cat > /var/www/buildmc/deploy.sh << 'EOF'
+#!/bin/bash
+echo "🚀 Starting deployment..."
+
+cd /var/www/buildmc
+
+# Pull latest code
+git pull origin main
+
+# Install dependencies
+npm install
+
+# Build production bundle
+npm run build
+
+# Restart PM2
+pm2 restart buildmc-store
+
+echo "✅ Deployment completed at $(date)"
+EOF
+
+# Make executable
+chmod +x /var/www/buildmc/deploy.sh
+```
+
+#### Managing Your Application
+
+**View logs:**
+```bash
+pm2 logs buildmc-store
+pm2 logs buildmc-store --lines 100
+```
+
+**Restart application:**
+```bash
+pm2 restart buildmc-store
+```
+
+**Stop application:**
+```bash
+pm2 stop buildmc-store
+```
+
+**Deploy updates:**
+```bash
+cd /var/www/buildmc
+./deploy.sh
+```
+
+**Monitor application:**
+```bash
+pm2 monit
+```
+
+**Check Nginx logs:**
+```bash
+tail -f /var/log/nginx/access.log
+tail -f /var/log/nginx/error.log
+```
+
+#### Docker Deployment (Alternative)
+
+For containerized deployment:
+
+**Create Dockerfile:**
+```dockerfile
+FROM node:18-alpine as builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY package*.json ./
+COPY server.js ./
+RUN npm install --production && npm install express compression
+EXPOSE 3000
+CMD ["node", "server.js"]
+```
+
+**Build and run:**
+```bash
+docker build -t buildmc-store .
+docker run -d -p 3000:3000 --name buildmc --restart always buildmc-store
+```
+
+**Using Docker Compose:**
+```yaml
+version: '3.8'
+services:
+  buildmc:
+    build: .
+    ports:
+      - "3000:3000"
+    restart: always
+    environment:
+      - PORT=3000
+```
+
+#### Important Notes
+
+- **Backend**: Lovable Cloud backend runs separately - only deploy frontend
+- **Database**: No database setup needed - handled by Lovable Cloud
+- **Environment Variables**: Keep `.env` secure with your Cloud credentials
+- **Updates**: Run `./deploy.sh` to deploy new versions
+- **Monitoring**: Use `pm2 monit` to track performance
+- **Backups**: Backup `/var/www/buildmc` directory regularly
+
+#### Troubleshooting
+
+**Application won't start:**
+```bash
+# Check PM2 logs
+pm2 logs buildmc-store
+
+# Check if port 3000 is available
+lsof -i :3000
+
+# Restart PM2
+pm2 restart buildmc-store
+```
+
+**502 Bad Gateway:**
+```bash
+# Verify app is running
+pm2 status
+
+# Check Nginx configuration
+nginx -t
+
+# Restart services
+pm2 restart buildmc-store
+systemctl restart nginx
+```
+
+**Can't connect to backend:**
+```bash
+# Verify environment variables
+cat /var/www/buildmc/.env
+
+# Rebuild application
+npm run build
+pm2 restart buildmc-store
+```
+
+**High memory usage:**
+```bash
+# Check PM2 stats
+pm2 monit
+
+# Restart app to clear memory
+pm2 restart buildmc-store
+```
+
+#### Security Best Practices
+
+1. **Keep system updated**: `apt update && apt upgrade`
+2. **Use SSH keys** instead of password authentication
+3. **Enable firewall**: Only allow necessary ports
+4. **Install fail2ban**: Prevent brute force attacks
+5. **Regular backups**: Backup code and configurations
+6. **Use HTTPS**: Always enable SSL certificates
+7. **Secure .env**: Keep credentials private, never commit to Git
+8. **Monitor logs**: Check for suspicious activity regularly
+
 ## 🔧 Environment Variables
 
 The following variables are automatically configured by Lovable Cloud:
