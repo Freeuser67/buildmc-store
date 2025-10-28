@@ -59,14 +59,23 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md border-primary/20 shadow-[0_0_30px_rgba(0,255,128,0.15)]">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+      </div>
+
+      <Card className="w-full max-w-md border-2 border-primary/30 shadow-xl backdrop-blur-sm bg-card/95 animate-fade-in relative z-10">
+        <CardHeader className="space-y-3">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg glow-effect">
+            <span className="text-3xl font-black text-primary-foreground">B</span>
+          </div>
+          <CardTitle className="text-3xl text-center font-bold">
             {isLogin ? 'Welcome Back' : 'Create Account'}
           </CardTitle>
-          <CardDescription className="text-center">
-            {isLogin ? 'Sign in to your BuildMC account' : 'Join BuildMC today'}
+          <CardDescription className="text-center text-base">
+            {isLogin ? 'Sign in to your BuildMC account' : 'Join BuildMC community today'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -118,7 +127,7 @@ const Auth = () => {
               )}
             </div>
 
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full py-6 text-base font-semibold shadow-lg hover:shadow-xl transition-all glow-effect">
               {isLogin ? 'Sign In' : 'Sign Up'}
             </Button>
           </form>
@@ -133,7 +142,7 @@ const Auth = () => {
           <Button 
             type="button" 
             variant="outline" 
-            className="w-full gap-2"
+            className="w-full gap-3 py-6 text-base font-semibold border-2 hover:border-primary/50 hover:bg-primary/5 transition-all"
             onClick={signInWithGoogle}
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">

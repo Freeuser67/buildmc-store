@@ -119,43 +119,89 @@ const Checkout = () => {
   };
 
   if (!product) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto px-4 py-12 max-w-4xl">
+          <div className="grid md:grid-cols-2 gap-8 animate-fade-in">
+            <Card className="border-2">
+              <CardHeader>
+                <div className="h-6 w-32 bg-muted rounded animate-pulse" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="aspect-square bg-muted rounded-lg animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-8 w-3/4 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-full bg-muted rounded animate-pulse" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-2">
+              <CardHeader>
+                <div className="h-6 w-40 bg-muted rounded animate-pulse" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+                    <div className="h-10 bg-muted rounded animate-pulse" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
-        <div className="grid md:grid-cols-2 gap-8">
+      <div className="container mx-auto px-4 py-16 max-w-5xl">
+        <div className="mb-12 text-center animate-fade-in">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Complete Your Order
+          </h1>
+          <p className="text-lg text-muted-foreground">Just a few steps away from your purchase</p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 animate-slide-up">
           {/* Product Summary */}
-          <Card>
+          <Card className="border-2 border-border/50 bg-card/50 backdrop-blur">
             <CardHeader>
-              <CardTitle>Order Summary</CardTitle>
+              <CardTitle className="text-2xl">Order Summary</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
+            <CardContent className="space-y-6">
+              <div className="relative aspect-square bg-gradient-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center overflow-hidden group">
                 {product.image_url ? (
-                  <img src={product.image_url} alt={product.name} className="w-full h-full object-cover rounded-lg" />
+                  <img 
+                    src={product.image_url} 
+                    alt={product.name} 
+                    className="w-full h-full object-cover rounded-2xl group-hover:scale-110 transition-transform duration-500" 
+                  />
                 ) : (
-                  <Package className="w-24 h-24 text-muted-foreground" />
+                  <div className="w-28 h-28 rounded-2xl bg-primary/10 flex items-center justify-center">
+                    <Package className="w-14 h-14 text-primary" />
+                  </div>
                 )}
               </div>
-              <div>
-                <h3 className="text-2xl font-bold">{product.name}</h3>
-                <p className="text-muted-foreground">{product.description}</p>
+              <div className="space-y-3">
+                <h3 className="text-3xl font-bold">{product.name}</h3>
+                <p className="text-muted-foreground text-base leading-relaxed">{product.description}</p>
               </div>
-              <div className="flex justify-between items-center pt-4 border-t">
-                <span className="text-lg">Total</span>
-                <span className="text-3xl font-bold text-primary">৳{product.price} BDT</span>
+              <div className="flex justify-between items-center pt-6 border-t-2 border-border/50">
+                <span className="text-xl font-semibold">Total Amount</span>
+                <span className="text-4xl font-bold text-primary">৳{product.price}</span>
               </div>
             </CardContent>
           </Card>
 
           {/* Checkout Form */}
-          <Card>
+          <Card className="border-2 border-border/50 bg-card/50 backdrop-blur">
             <CardHeader>
-              <CardTitle>Delivery Details</CardTitle>
-              <CardDescription>Fill in your information for the order</CardDescription>
+              <CardTitle className="text-2xl">Delivery Details</CardTitle>
+              <CardDescription className="text-base">Fill in your information to complete the order</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -218,8 +264,12 @@ const Checkout = () => {
                   {errors.paymentMethod && <p className="text-sm text-destructive">{errors.paymentMethod}</p>}
                 </div>
 
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Processing...' : 'Place Order'}
+                <Button 
+                  type="submit" 
+                  className="w-full py-6 text-base font-semibold shadow-lg hover:shadow-xl transition-all glow-effect mt-6" 
+                  disabled={loading}
+                >
+                  {loading ? 'Processing Order...' : 'Place Order'}
                 </Button>
               </form>
             </CardContent>

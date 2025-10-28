@@ -6,6 +6,7 @@ import { Navbar } from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Package, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { OrderCardSkeleton } from '@/components/LoadingSkeleton';
 
 interface Order {
   id: string;
@@ -74,57 +75,77 @@ const Orders = () => {
     }
   };
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-          My Orders
-        </h1>
+      <div className="container mx-auto px-4 py-16">
+        <div className="mb-12 animate-fade-in">
+          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-primary-glow to-secondary bg-clip-text text-transparent">
+            My Orders
+          </h1>
+          <p className="text-lg text-muted-foreground">Track and manage your BuildMC purchases</p>
+        </div>
 
-        {orders.length === 0 ? (
-          <Card className="p-12 text-center">
-            <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-xl text-muted-foreground">No orders yet</p>
+        {loading ? (
+          <div className="space-y-6 animate-slide-up">
+            {[1, 2, 3].map((i) => (
+              <OrderCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : orders.length === 0 ? (
+          <Card className="p-16 text-center border-2 border-dashed border-border/50 bg-card/30 backdrop-blur rounded-2xl animate-slide-up">
+            <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-muted/50 flex items-center justify-center">
+              <Package className="w-12 h-12 text-muted-foreground" />
+            </div>
+            <p className="text-2xl font-semibold text-muted-foreground mb-2">No orders yet</p>
+            <p className="text-muted-foreground/70">Start shopping to see your orders here!</p>
           </Card>
         ) : (
-          <div className="space-y-4">
-            {orders.map((order) => (
-              <Card key={order.id} className="hover:shadow-[0_0_20px_rgba(0,255,128,0.15)] transition-all">
+          <div className="space-y-6">
+            {orders.map((order, index) => (
+              <Card 
+                key={order.id} 
+                className="group border-2 border-border/50 bg-card/50 backdrop-blur hover-lift hover:border-primary/50 transition-all animate-slide-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
                 <CardHeader>
                   <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-xl mb-2">{order.products.name}</CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(order.created_at).toLocaleDateString()} at{' '}
-                        {new Date(order.created_at).toLocaleTimeString()}
-                      </p>
+                    <div className="space-y-2">
+                      <CardTitle className="text-2xl group-hover:text-primary transition-colors">
+                        {order.products.name}
+                      </CardTitle>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="w-4 h-4" />
+                        <span>
+                          {new Date(order.created_at).toLocaleDateString()} at{' '}
+                          {new Date(order.created_at).toLocaleTimeString()}
+                        </span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {getStatusIcon(order.status)}
-                      <Badge variant={getStatusVariant(order.status)}>
+                      <Badge 
+                        variant={getStatusVariant(order.status)}
+                        className="font-semibold px-3 py-1"
+                      >
                         {order.status.toUpperCase()}
                       </Badge>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Minecraft Name</p>
-                      <p className="font-medium">{order.minecraft_name}</p>
+                  <div className="grid md:grid-cols-3 gap-6 pt-4 border-t border-border/50">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Minecraft Name</p>
+                      <p className="text-base font-semibold">{order.minecraft_name}</p>
                     </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Payment Method</p>
-                      <p className="font-medium capitalize">{order.payment_method}</p>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Payment Method</p>
+                      <p className="text-base font-semibold capitalize">{order.payment_method}</p>
                     </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Total Price</p>
-                      <p className="font-bold text-primary text-xl">৳{order.total_price}</p>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Total Price</p>
+                      <p className="font-bold text-primary text-2xl">৳{order.total_price}</p>
                     </div>
                   </div>
                 </CardContent>

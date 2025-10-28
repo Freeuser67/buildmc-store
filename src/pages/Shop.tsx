@@ -10,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import heroImage from '@/assets/hero-minecraft.jpg';
 import { ShoppingCart, Package, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { ProductCardSkeleton } from '@/components/LoadingSkeleton';
 
 interface Category {
   id: string;
@@ -81,15 +82,12 @@ const Shop = () => {
 
   const handleBuyNow = (productId: string) => {
     if (!user) {
+      toast.info('Please sign in to make a purchase');
       navigate('/auth');
       return;
     }
     navigate(`/checkout/${productId}`);
   };
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -172,8 +170,14 @@ const Shop = () => {
           </TabsList>
 
           <TabsContent value={selectedCategory} className="space-y-8">
-            {filteredProducts.length === 0 ? (
-              <Card className="p-16 text-center border-2 border-dashed border-border/50 bg-card/30 backdrop-blur rounded-2xl">
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <Card className="p-16 text-center border-2 border-dashed border-border/50 bg-card/30 backdrop-blur rounded-2xl animate-fade-in">
                 <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-muted/50 flex items-center justify-center">
                   <Package className="w-12 h-12 text-muted-foreground" />
                 </div>
