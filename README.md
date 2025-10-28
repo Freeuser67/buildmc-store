@@ -252,10 +252,12 @@ npm install
 npm run build
 ```
 
-#### Step 5: Create Node.js Server
+#### Step 5: Create Node.js Server (server.js)
 
+This is your main application entry point that serves the built React app.
+
+**Create server.js file:**
 ```bash
-# Create server file
 cat > server.js << 'EOF'
 const express = require('express');
 const path = require('path');
@@ -264,28 +266,74 @@ const compression = require('compression');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Enable gzip compression
+// Enable gzip compression for better performance
 app.use(compression());
+
+// Security headers
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
 
 // Serve static files with caching
 app.use(express.static(path.join(__dirname, 'dist'), {
   maxAge: '1y',
-  etag: true
+  etag: true,
+  setHeaders: (res, filepath) => {
+    if (filepath.endsWith('.html')) {
+      // Don't cache HTML files
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  }
 }));
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // SPA fallback - all routes serve index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`BuildMC Store running on port ${PORT}`);
+// Error handling
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 BuildMC Store running on port ${PORT}`);
+  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully...');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully...');
+  process.exit(0);
 });
 EOF
+```
 
-# Install Express and compression
+**Install required dependencies:**
+```bash
 npm install express compression
 ```
+
+**Test the server locally:**
+```bash
+node server.js
+```
+
+Your app should now be accessible at `http://localhost:3000`
 
 #### Step 6: Setup PM2 (Process Manager)
 
