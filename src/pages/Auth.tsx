@@ -65,7 +65,7 @@ const Auth = () => {
             {isLogin ? 'Welcome Back' : 'Create Account'}
           </CardTitle>
           <CardDescription className="text-center">
-            {isLogin ? 'Sign in to your Ecomars account' : 'Join Ecomars today'}
+            {isLogin ? 'Sign in to your BuildMC account' : 'Join BuildMC today'}
           </CardDescription>
         </CardHeader>
         <CardContent>

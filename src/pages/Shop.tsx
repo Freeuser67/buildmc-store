@@ -8,7 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Navbar } from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import heroImage from '@/assets/hero-minecraft.jpg';
-import { ShoppingCart, Package } from 'lucide-react';
+import { ShoppingCart, Package, Copy, Check } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Category {
   id: string;
@@ -30,8 +31,22 @@ const Shop = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [copied, setCopied] = useState(false);
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  
+  const serverIP = 'build-mc.fun';
+  
+  const handleCopyIP = async () => {
+    try {
+      await navigator.clipboard.writeText(serverIP);
+      setCopied(true);
+      toast.success('Server IP copied to clipboard!');
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      toast.error('Failed to copy IP');
+    }
+  };
 
   useEffect(() => {
     fetchCategories();
@@ -89,13 +104,24 @@ const Shop = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center space-y-4 px-4">
+          <div className="text-center space-y-6 px-4">
             <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              ECOMARS SHOP
+              BuildMC
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground">
               Premium Minecraft Items & Resources
             </p>
+            <div className="inline-flex items-center gap-2 bg-card/90 backdrop-blur-sm px-6 py-3 rounded-lg border border-primary/20">
+              <span className="text-lg font-semibold text-foreground">Server IP:</span>
+              <Button
+                variant="ghost"
+                className="gap-2 text-primary font-mono text-lg hover:bg-primary/10"
+                onClick={handleCopyIP}
+              >
+                {serverIP}
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -148,7 +174,7 @@ const Shop = () => {
                     <CardContent>
                       <div className="flex justify-between items-center">
                         <span className="text-2xl font-bold text-primary">
-                          ${product.price}
+                          ৳{product.price}
                         </span>
                         <Button 
                           onClick={() => handleBuyNow(product.id)}

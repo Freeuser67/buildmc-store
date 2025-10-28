@@ -248,7 +248,7 @@ const AdminProducts = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Price</span>
-                    <span className="font-bold text-primary">${product.price}</span>
+                    <span className="font-bold text-primary">৳{product.price}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Stock</span>

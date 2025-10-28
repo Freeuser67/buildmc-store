@@ -124,7 +124,7 @@ const Orders = () => {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Total Price</p>
-                      <p className="font-bold text-primary text-xl">${order.total_price}</p>
+                      <p className="font-bold text-primary text-xl">৳{order.total_price}</p>
                     </div>
                   </div>
                 </CardContent>

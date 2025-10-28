@@ -106,7 +106,7 @@ const AdminDashboard = () => {
               <DollarSign className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
+              <div className="text-3xl font-bold">৳{stats.totalRevenue.toFixed(2)}</div>
             </CardContent>
           </Card>
         </div>
