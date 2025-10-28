@@ -11,7 +11,7 @@ export const Navbar = () => {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link to="/" className="text-2xl font-bold text-primary hover:text-primary/80 transition-colors">
           <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            ECOMARS
+            BuildMC Store
           </span>
         </Link>
 
