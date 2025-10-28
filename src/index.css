@@ -8,87 +8,85 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 200 20% 8%;
-    --foreground: 180 100% 95%;
+    --background: 220 25% 6%;
+    --foreground: 180 100% 98%;
 
-    --card: 200 25% 12%;
-    --card-foreground: 180 100% 95%;
+    --card: 220 20% 10%;
+    --card-foreground: 180 100% 98%;
 
-    --popover: 200 25% 10%;
-    --popover-foreground: 180 100% 95%;
+    --popover: 220 25% 8%;
+    --popover-foreground: 180 100% 98%;
 
-    --primary: 165 100% 50%;
-    --primary-foreground: 200 20% 8%;
+    --primary: 142 76% 55%;
+    --primary-foreground: 220 25% 6%;
+    --primary-glow: 142 76% 65%;
 
-    --secondary: 190 100% 45%;
-    --secondary-foreground: 200 20% 8%;
+    --secondary: 200 95% 55%;
+    --secondary-foreground: 220 25% 6%;
 
-    --muted: 200 20% 20%;
-    --muted-foreground: 180 20% 60%;
+    --muted: 220 15% 18%;
+    --muted-foreground: 180 15% 65%;
 
-    --accent: 165 100% 50%;
-    --accent-foreground: 200 20% 8%;
+    --accent: 142 76% 55%;
+    --accent-foreground: 220 25% 6%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 200 20% 20%;
-    --input: 200 25% 15%;
-    --ring: 165 100% 50%;
+    --border: 220 15% 18%;
+    --input: 220 20% 14%;
+    --ring: 142 76% 55%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
     
-    --gradient-hero: linear-gradient(135deg, hsl(200 25% 10%), hsl(165 100% 15% / 0.3));
-    --gradient-card: linear-gradient(180deg, hsl(200 25% 12%), hsl(200 25% 10%));
-    --glow-primary: 0 0 40px hsl(165 100% 50% / 0.3);
-    --glow-secondary: 0 0 30px hsl(190 100% 45% / 0.3);
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --gradient-primary: linear-gradient(135deg, hsl(142 76% 55%), hsl(142 76% 65%));
+    --gradient-hero: linear-gradient(135deg, hsl(220 25% 6%) 0%, hsl(142 76% 15% / 0.2) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(220 20% 12%), hsl(220 20% 8%));
+    --gradient-hover: linear-gradient(145deg, hsl(220 20% 14%), hsl(220 20% 10%));
+    --shadow-elegant: 0 10px 40px -10px hsl(142 76% 35% / 0.4);
+    --shadow-glow: 0 0 50px hsl(142 76% 55% / 0.25);
+    --glow-primary: 0 0 60px hsl(142 76% 55% / 0.4);
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 200 20% 8%;
-    --foreground: 180 100% 95%;
+    --background: 220 25% 6%;
+    --foreground: 180 100% 98%;
 
-    --card: 200 25% 12%;
-    --card-foreground: 180 100% 95%;
+    --card: 220 20% 10%;
+    --card-foreground: 180 100% 98%;
 
-    --popover: 200 25% 10%;
-    --popover-foreground: 180 100% 95%;
+    --popover: 220 25% 8%;
+    --popover-foreground: 180 100% 98%;
 
-    --primary: 165 100% 50%;
-    --primary-foreground: 200 20% 8%;
+    --primary: 142 76% 55%;
+    --primary-foreground: 220 25% 6%;
+    --primary-glow: 142 76% 65%;
 
-    --secondary: 190 100% 45%;
-    --secondary-foreground: 200 20% 8%;
+    --secondary: 200 95% 55%;
+    --secondary-foreground: 220 25% 6%;
 
-    --muted: 200 20% 20%;
-    --muted-foreground: 180 20% 60%;
+    --muted: 220 15% 18%;
+    --muted-foreground: 180 15% 65%;
 
-    --accent: 165 100% 50%;
-    --accent-foreground: 200 20% 8%;
+    --accent: 142 76% 55%;
+    --accent-foreground: 220 25% 6%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 200 20% 20%;
-    --input: 200 25% 15%;
-    --ring: 165 100% 50%;
+    --border: 220 15% 18%;
+    --input: 220 20% 14%;
+    --ring: 142 76% 55%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -97,6 +95,51 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+  }
+  
+  .hover-lift {
+    transition: var(--transition-smooth);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-elegant);
+  }
+  
+  .glow-effect {
+    box-shadow: var(--glow-primary);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
