@@ -42,6 +42,7 @@ const AdminProducts = () => {
     stock: '',
     category_id: '',
   });
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -74,8 +75,35 @@ const AdminProducts = () => {
     }
   };
 
+  const validateImageUrl = (url: string): boolean => {
+    if (!url) return true; // Empty is valid (optional field)
+    
+    const supportedFormats = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.avif', '.bmp'];
+    const urlLower = url.toLowerCase();
+    
+    return supportedFormats.some(format => urlLower.includes(format));
+  };
+
+  const handleImageUrlChange = (url: string) => {
+    setFormData({ ...formData, image_url: url });
+    if (url) {
+      const isValid = validateImageUrl(url);
+      setImageError(!isValid);
+      if (!isValid) {
+        toast.error('Please enter a valid image URL (png, jpg, jpeg, webp, gif, svg, avif, bmp)');
+      }
+    } else {
+      setImageError(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (formData.image_url && !validateImageUrl(formData.image_url)) {
+      toast.error('Please enter a valid image URL');
+      return;
+    }
     
     const { error } = await supabase.from('products').insert({
       name: formData.name,
@@ -98,6 +126,7 @@ const AdminProducts = () => {
         stock: '',
         category_id: '',
       });
+      setImageError(false);
       setIsOpen(false);
       fetchProducts();
     }
@@ -206,14 +235,29 @@ const AdminProducts = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image_url">Image URL</Label>
+                <Label htmlFor="image_url">Image URL (PNG, JPG, JPEG, WEBP, GIF, SVG, AVIF, BMP)</Label>
                 <Input
                   id="image_url"
                   type="url"
                   value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  onChange={(e) => handleImageUrlChange(e.target.value)}
                   placeholder="https://example.com/image.jpg"
+                  className={imageError ? 'border-destructive' : ''}
                 />
+                {formData.image_url && !imageError && (
+                  <div className="mt-2 p-2 border rounded-lg bg-muted/50">
+                    <p className="text-xs text-muted-foreground mb-2">Image Preview:</p>
+                    <img 
+                      src={formData.image_url} 
+                      alt="Preview" 
+                      className="w-full h-32 object-contain rounded"
+                      onError={() => setImageError(true)}
+                    />
+                  </div>
+                )}
+                {imageError && (
+                  <p className="text-xs text-destructive">Invalid image URL or format not supported</p>
+                )}
               </div>
 
               <Button type="submit" className="w-full">Create Product</Button>
