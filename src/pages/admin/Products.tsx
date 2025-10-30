@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Navbar } from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { Trash2, Plus, ArrowLeft, Package } from 'lucide-react';
+import { Trash2, Plus, ArrowLeft, Package, Pencil } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -34,6 +34,7 @@ const AdminProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -105,19 +106,34 @@ const AdminProducts = () => {
       return;
     }
     
-    const { error } = await supabase.from('products').insert({
+    const productData = {
       name: formData.name,
       description: formData.description || null,
       price: parseFloat(formData.price),
       image_url: formData.image_url || null,
       stock: parseInt(formData.stock),
       category_id: formData.category_id || null,
-    });
+    };
+
+    let error;
+    
+    if (editingId) {
+      // Update existing product
+      const result = await supabase
+        .from('products')
+        .update(productData)
+        .eq('id', editingId);
+      error = result.error;
+    } else {
+      // Create new product
+      const result = await supabase.from('products').insert(productData);
+      error = result.error;
+    }
 
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success('Product created!');
+      toast.success(editingId ? 'Product updated!' : 'Product created!');
       setFormData({
         name: '',
         description: '',
@@ -127,8 +143,40 @@ const AdminProducts = () => {
         category_id: '',
       });
       setImageError(false);
+      setEditingId(null);
       setIsOpen(false);
       fetchProducts();
+    }
+  };
+
+  const handleEdit = (product: Product) => {
+    setFormData({
+      name: product.name,
+      description: product.description || '',
+      price: product.price.toString(),
+      image_url: product.image_url || '',
+      stock: product.stock.toString(),
+      category_id: product.category_id || '',
+    });
+    setEditingId(product.id);
+    setImageError(false);
+    setIsOpen(true);
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      // Reset form when closing
+      setFormData({
+        name: '',
+        description: '',
+        price: '',
+        image_url: '',
+        stock: '',
+        category_id: '',
+      });
+      setEditingId(null);
+      setImageError(false);
     }
   };
 
@@ -161,7 +209,7 @@ const AdminProducts = () => {
           </h1>
         </div>
 
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={isOpen} onOpenChange={handleDialogClose}>
           <DialogTrigger asChild>
             <Button className="mb-6 gap-2">
               <Plus className="w-4 h-4" />
@@ -170,7 +218,7 @@ const AdminProducts = () => {
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Create New Product</DialogTitle>
+              <DialogTitle>{editingId ? 'Edit Product' : 'Create New Product'}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
@@ -260,7 +308,9 @@ const AdminProducts = () => {
                 )}
               </div>
 
-              <Button type="submit" className="w-full">Create Product</Button>
+              <Button type="submit" className="w-full">
+                {editingId ? 'Update Product' : 'Create Product'}
+              </Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -278,14 +328,24 @@ const AdminProducts = () => {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <CardTitle className="text-lg">{product.name}</CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(product.id)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEdit(product)}
+                      className="hover:text-primary"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(product.id)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
