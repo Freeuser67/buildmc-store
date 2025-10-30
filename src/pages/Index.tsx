@@ -1,10 +1,65 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag, Shield, Zap } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { ShoppingBag, Shield, Zap, Package, ArrowRight } from 'lucide-react';
 import heroImage from '@/assets/hero-minecraft.jpg';
 
+interface Product {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  image_url: string | null;
+  stock: number;
+  category_id: string | null;
+}
+
+interface Category {
+  id: string;
+  name: string;
+}
+
 const Index = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedFilter, setSelectedFilter] = useState<string>('all');
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, []);
+
+  const fetchProducts = async () => {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('name')
+      .limit(6);
+    
+    if (!error && data) {
+      setProducts(data);
+    }
+  };
+
+  const fetchCategories = async () => {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('name');
+    
+    if (!error && data) {
+      setCategories(data);
+    }
+  };
+
+  const filteredProducts = selectedFilter === 'all'
+    ? products
+    : products.filter(p => p.category_id === selectedFilter);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -87,6 +142,125 @@ const Index = () => {
             <p className="text-muted-foreground leading-relaxed">Exclusive ranks and items carefully curated for your server</p>
           </div>
         </div>
+      </div>
+
+      {/* Shop Preview Section */}
+      <div className="container mx-auto px-4 pb-16">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Featured Products
+          </h2>
+          <Button asChild size="lg" className="gap-2">
+            <Link to="/shop">
+              Shop
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </Button>
+        </div>
+
+        {/* Filter Tabs - Centered Layout */}
+        <div className="flex justify-center items-center gap-4 mb-12 flex-wrap">
+          {/* Left Side Filters */}
+          <div className="flex gap-2">
+            {categories.slice(0, Math.floor(categories.length / 2)).map((cat) => (
+              <Button
+                key={cat.id}
+                variant={selectedFilter === cat.id ? "default" : "outline"}
+                onClick={() => setSelectedFilter(cat.id)}
+                className="rounded-xl px-6 py-3 font-semibold"
+              >
+                {cat.name}
+              </Button>
+            ))}
+          </div>
+
+          {/* Center - All Items */}
+          <Button
+            variant={selectedFilter === 'all' ? "default" : "outline"}
+            onClick={() => setSelectedFilter('all')}
+            className="rounded-xl px-8 py-3 font-semibold text-lg shadow-lg"
+          >
+            All Items
+          </Button>
+
+          {/* Right Side Filters */}
+          <div className="flex gap-2">
+            {categories.slice(Math.floor(categories.length / 2)).map((cat) => (
+              <Button
+                key={cat.id}
+                variant={selectedFilter === cat.id ? "default" : "outline"}
+                onClick={() => setSelectedFilter(cat.id)}
+                className="rounded-xl px-6 py-3 font-semibold"
+              >
+                {cat.name}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        {filteredProducts.length === 0 ? (
+          <Card className="p-16 text-center border-2 border-dashed">
+            <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-xl text-muted-foreground">No products available</p>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredProducts.map((product) => (
+              <Card 
+                key={product.id} 
+                className="group overflow-hidden border-2 bg-card/50 backdrop-blur hover-lift hover:border-primary/50 transition-all rounded-2xl"
+              >
+                <div className="relative h-56 bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center overflow-hidden">
+                  {product.image_url ? (
+                    <img 
+                      src={product.image_url} 
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center">
+                      <Package className="w-10 h-10 text-primary" />
+                    </div>
+                  )}
+                  <div className="absolute top-4 right-4">
+                    <Badge 
+                      variant={product.stock > 0 ? "default" : "secondary"}
+                      className="shadow-lg font-semibold"
+                    >
+                      {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                    </Badge>
+                  </div>
+                </div>
+                <CardHeader>
+                  <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                    {product.name}
+                  </CardTitle>
+                  <CardDescription>
+                    {product.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex justify-between items-center pt-4 border-t">
+                    <span className="text-2xl font-bold text-primary">
+                      ৳{product.price}
+                    </span>
+                    <Button 
+                      asChild
+                      disabled={product.stock === 0}
+                      className="gap-2 shadow-lg glow-effect"
+                    >
+                      <Link to={`/checkout/${product.id}`}>
+                        <ShoppingBag className="w-4 h-4" />
+                        Buy Now
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* CTA Section */}
