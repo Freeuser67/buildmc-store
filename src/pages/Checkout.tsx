@@ -14,10 +14,13 @@ import { z } from 'zod';
 import { Package } from 'lucide-react';
 
 const checkoutSchema = z.object({
-  customerRealName: z.string().trim().min(2, 'Name must be at least 2 characters'),
-  minecraftName: z.string().trim().min(2, 'Minecraft name is required'),
-  customerPhone: z.string().trim().min(10, 'Valid phone number required'),
-  customerEmail: z.string().trim().email('Invalid email address'),
+  customerRealName: z.string().trim().min(2, 'Name must be at least 2 characters').max(100, 'Name too long'),
+  minecraftName: z.string().trim().min(2, 'Minecraft name is required').max(50, 'Minecraft name too long'),
+  customerPhone: z.string()
+    .trim()
+    .regex(/^01[0-9]{9}$/, 'Invalid phone number (must be 01XXXXXXXXX)')
+    .length(11, 'Phone number must be exactly 11 digits'),
+  customerEmail: z.string().trim().email('Invalid email address').max(255, 'Email too long'),
   paymentMethod: z.string().min(1, 'Payment method is required'),
 });
 

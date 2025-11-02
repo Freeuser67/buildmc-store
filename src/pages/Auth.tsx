@@ -9,9 +9,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { z } from 'zod';
 
 const authSchema = z.object({
-  email: z.string().trim().email({ message: 'Invalid email address' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
-  fullName: z.string().trim().min(2, { message: 'Name must be at least 2 characters' }).optional(),
+  email: z.string().trim().email({ message: 'Invalid email address' }).max(255, { message: 'Email too long' }),
+  password: z.string()
+    .min(8, { message: 'Password must be at least 8 characters' })
+    .max(128, { message: 'Password too long' })
+    .regex(/[A-Z]/, { message: 'Password must contain at least one uppercase letter' })
+    .regex(/[a-z]/, { message: 'Password must contain at least one lowercase letter' })
+    .regex(/[0-9]/, { message: 'Password must contain at least one number' }),
+  fullName: z.string().trim().min(2, { message: 'Name must be at least 2 characters' }).max(100, { message: 'Name too long' }).optional(),
 });
 
 const Auth = () => {

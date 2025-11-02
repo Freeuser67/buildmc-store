@@ -10,7 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Navbar } from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { ArrowLeft, Clock, CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, Clock, CheckCircle, XCircle, Trash2, Eye, EyeOff } from 'lucide-react';
 
 interface Order {
   id: string;
@@ -31,6 +31,30 @@ const AdminOrders = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [visiblePII, setVisiblePII] = useState<Set<string>>(new Set());
+
+  const maskEmail = (email: string) => {
+    const [name, domain] = email.split('@');
+    return `${name[0]}${'*'.repeat(Math.min(name.length - 1, 3))}@${domain}`;
+  };
+
+  const maskPhone = (phone: string) => {
+    return `*****${phone.slice(-4)}`;
+  };
+
+  const togglePIIVisibility = (orderId: string) => {
+    setVisiblePII(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(orderId)) {
+        newSet.delete(orderId);
+        toast.info('PII masked for security');
+      } else {
+        newSet.add(orderId);
+        toast.info('Viewing full customer details');
+      }
+      return newSet;
+    });
+  };
 
   useEffect(() => {
     if (!isAdmin) {
@@ -121,6 +145,27 @@ const AdminOrders = () => {
                 </div>
               </CardHeader>
               <CardContent>
+                <div className="flex justify-between items-center mb-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => togglePIIVisibility(order.id)}
+                    className="gap-2"
+                  >
+                    {visiblePII.has(order.id) ? (
+                      <>
+                        <EyeOff className="w-4 h-4" />
+                        Hide Details
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="w-4 h-4" />
+                        View Full Details
+                      </>
+                    )}
+                  </Button>
+                </div>
+
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Customer Name</p>
@@ -132,11 +177,15 @@ const AdminOrders = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Email</p>
-                    <p className="font-medium">{order.customer_email}</p>
+                    <p className="font-medium">
+                      {visiblePII.has(order.id) ? order.customer_email : maskEmail(order.customer_email)}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Phone</p>
-                    <p className="font-medium">{order.customer_phone}</p>
+                    <p className="font-medium">
+                      {visiblePII.has(order.id) ? order.customer_phone : maskPhone(order.customer_phone)}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Payment Method</p>
