@@ -28,9 +28,24 @@ interface Product {
   category_id: string | null;
 }
 
+interface QuickLink {
+  id: string;
+  title: string;
+  url: string;
+  display_order: number;
+}
+
+interface SiteSetting {
+  setting_key: string;
+  setting_value: string;
+}
+
 const Shop = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [quickLinks, setQuickLinks] = useState<QuickLink[]>([]);
+  const [discordUrl, setDiscordUrl] = useState('https://discord.gg/buildmc');
+  const [youtubeUrl, setYoutubeUrl] = useState('https://youtube.com/@buildmc');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [copied, setCopied] = useState(false);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
@@ -53,6 +68,8 @@ const Shop = () => {
   useEffect(() => {
     fetchCategories();
     fetchProducts();
+    fetchQuickLinks();
+    fetchSocialLinks();
   }, []);
 
   const fetchCategories = async () => {
@@ -77,6 +94,32 @@ const Shop = () => {
       setProducts(data);
     }
     setIsLoadingProducts(false);
+  };
+
+  const fetchQuickLinks = async () => {
+    const { data, error } = await supabase
+      .from('quick_links')
+      .select('*')
+      .order('display_order');
+    
+    if (!error && data) {
+      setQuickLinks(data);
+    }
+  };
+
+  const fetchSocialLinks = async () => {
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('*');
+    
+    if (!error && data) {
+      const settings = data as SiteSetting[];
+      const discord = settings.find(s => s.setting_key === 'discord_url');
+      const youtube = settings.find(s => s.setting_key === 'youtube_url');
+      
+      if (discord) setDiscordUrl(discord.setting_value);
+      if (youtube) setYoutubeUrl(youtube.setting_value);
+    }
   };
 
   const filteredProducts = selectedCategory === 'all'
@@ -364,8 +407,8 @@ const Shop = () => {
                 <div className="flex gap-4 justify-center md:justify-start">
                   <Button 
                     size="lg" 
-                    className="gap-2 neon-border glow-effect rounded-xl font-bold"
-                    onClick={() => window.open('https://discord.gg/buildmc', '_blank')}
+                    className="gap-2 neon-border glow-effect rounded-xl font-bold hover:scale-110 transition-all"
+                    onClick={() => window.open(discordUrl, '_blank')}
                   >
                     <MessageCircle className="w-5 h-5" />
                     Discord
@@ -373,8 +416,8 @@ const Shop = () => {
                   <Button 
                     size="lg"
                     variant="outline"
-                    className="gap-2 glass-effect border-2 border-primary/30 rounded-xl font-bold"
-                    onClick={() => window.open('https://youtube.com/@buildmc', '_blank')}
+                    className="gap-2 glass-effect border-2 border-primary/30 rounded-xl font-bold hover:scale-110 transition-all"
+                    onClick={() => window.open(youtubeUrl, '_blank')}
                   >
                     <Youtube className="w-5 h-5" />
                     YouTube
@@ -385,28 +428,23 @@ const Shop = () => {
               {/* Quick Links */}
               <div className="text-center">
                 <h4 className="text-xl font-bold text-foreground mb-6">Quick Links</h4>
-                <ul className="space-y-3">
-                  <li>
-                    <Button variant="link" className="text-muted-foreground hover:text-primary text-base font-medium">
-                      Vote for Us
-                    </Button>
-                  </li>
-                  <li>
-                    <Button variant="link" className="text-muted-foreground hover:text-primary text-base font-medium">
-                      Server Rules
-                    </Button>
-                  </li>
-                  <li>
-                    <Button variant="link" className="text-muted-foreground hover:text-primary text-base font-medium">
-                      Staff Applications
-                    </Button>
-                  </li>
-                  <li>
-                    <Button variant="link" className="text-muted-foreground hover:text-primary text-base font-medium">
-                      Ban Appeals
-                    </Button>
-                  </li>
-                </ul>
+                {quickLinks.length > 0 ? (
+                  <ul className="space-y-3">
+                    {quickLinks.map((link) => (
+                      <li key={link.id}>
+                        <Button 
+                          variant="link" 
+                          className="text-muted-foreground hover:text-primary text-base font-medium hover:scale-110 transition-all"
+                          onClick={() => window.open(link.url, '_blank')}
+                        >
+                          {link.title}
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-muted-foreground text-sm">No quick links available</p>
+                )}
               </div>
 
               {/* Server Info */}
