@@ -146,13 +146,19 @@ const SiteSettings = () => {
     try {
       const { error: discordError } = await supabase
         .from("site_settings")
-        .upsert({ setting_key: "discord_url", setting_value: discordUrl });
+        .upsert(
+          { setting_key: "discord_url", setting_value: discordUrl },
+          { onConflict: 'setting_key' }
+        );
 
       if (discordError) throw discordError;
 
       const { error: youtubeError } = await supabase
         .from("site_settings")
-        .upsert({ setting_key: "youtube_url", setting_value: youtubeUrl });
+        .upsert(
+          { setting_key: "youtube_url", setting_value: youtubeUrl },
+          { onConflict: 'setting_key' }
+        );
 
       if (youtubeError) throw youtubeError;
 
