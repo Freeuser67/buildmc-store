@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Save, ExternalLink } from "lucide-react";
+import { Trash2, Plus, Save, ExternalLink, Type } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 interface QuickLink {
   id: string;
@@ -18,8 +19,10 @@ interface QuickLink {
 }
 
 interface SiteSetting {
+  id?: string;
   setting_key: string;
   setting_value: string;
+  description?: string;
 }
 
 const SiteSettings = () => {
@@ -27,14 +30,10 @@ const SiteSettings = () => {
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const [quickLinks, setQuickLinks] = useState<QuickLink[]>([]);
-  const [discordUrl, setDiscordUrl] = useState("");
-  const [youtubeUrl, setYoutubeUrl] = useState("");
-  const [activePlayers, setActivePlayers] = useState("15K+");
-  const [eventsHosted, setEventsHosted] = useState("500+");
-  const [uptime, setUptime] = useState("24/7");
-  const [heroTitle, setHeroTitle] = useState("BuildMC");
-  const [heroSubtitle, setHeroSubtitle] = useState("Premium Ranks • Exclusive Kits • Epic Items");
-  const [serverStatus, setServerStatus] = useState("Server Online • 247 Players");
+  const [textSettings, setTextSettings] = useState<SiteSetting[]>([]);
+  const [newSettingKey, setNewSettingKey] = useState("");
+  const [newSettingValue, setNewSettingValue] = useState("");
+  const [newSettingDescription, setNewSettingDescription] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -59,19 +58,12 @@ const SiteSettings = () => {
       // Fetch site settings
       const { data: settingsData, error: settingsError } = await supabase
         .from("site_settings")
-        .select("*");
+        .select("*")
+        .order("setting_key");
 
       if (settingsError) throw settingsError;
       
-      const settings = settingsData as SiteSetting[];
-      setDiscordUrl(settings.find(s => s.setting_key === "discord_url")?.setting_value || "");
-      setYoutubeUrl(settings.find(s => s.setting_key === "youtube_url")?.setting_value || "");
-      setActivePlayers(settings.find(s => s.setting_key === "active_players")?.setting_value || "15K+");
-      setEventsHosted(settings.find(s => s.setting_key === "events_hosted")?.setting_value || "500+");
-      setUptime(settings.find(s => s.setting_key === "uptime")?.setting_value || "24/7");
-      setHeroTitle(settings.find(s => s.setting_key === "hero_title")?.setting_value || "BuildMC");
-      setHeroSubtitle(settings.find(s => s.setting_key === "hero_subtitle")?.setting_value || "Premium Ranks • Exclusive Kits • Epic Items");
-      setServerStatus(settings.find(s => s.setting_key === "server_status")?.setting_value || "Server Online • 247 Players");
+      setTextSettings(settingsData || []);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -154,31 +146,81 @@ const SiteSettings = () => {
     }
   };
 
-  const saveSettings = async () => {
-    try {
-      const settingsToSave = [
-        { setting_key: "discord_url", setting_value: discordUrl },
-        { setting_key: "youtube_url", setting_value: youtubeUrl },
-        { setting_key: "active_players", setting_value: activePlayers },
-        { setting_key: "events_hosted", setting_value: eventsHosted },
-        { setting_key: "uptime", setting_value: uptime },
-        { setting_key: "hero_title", setting_value: heroTitle },
-        { setting_key: "hero_subtitle", setting_value: heroSubtitle },
-        { setting_key: "server_status", setting_value: serverStatus },
-      ];
+  const updateTextSetting = (id: string, field: keyof SiteSetting, value: string) => {
+    setTextSettings(textSettings.map(setting =>
+      setting.id === id ? { ...setting, [field]: value } : setting
+    ));
+  };
 
-      for (const setting of settingsToSave) {
+  const addTextSetting = () => {
+    if (!newSettingKey || !newSettingValue) {
+      toast({
+        title: "Error",
+        description: "Please fill in both key and value",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newSetting: SiteSetting = {
+      id: crypto.randomUUID(),
+      setting_key: newSettingKey,
+      setting_value: newSettingValue,
+      description: newSettingDescription || undefined,
+    };
+
+    setTextSettings([...textSettings, newSetting]);
+    setNewSettingKey("");
+    setNewSettingValue("");
+    setNewSettingDescription("");
+  };
+
+  const deleteTextSetting = async (id: string, settingKey: string) => {
+    try {
+      const { error } = await supabase
+        .from("site_settings")
+        .delete()
+        .eq("setting_key", settingKey);
+
+      if (error) throw error;
+
+      setTextSettings(textSettings.filter(s => s.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Setting deleted successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const saveTextSettings = async () => {
+    try {
+      for (const setting of textSettings) {
         const { error } = await supabase
           .from("site_settings")
-          .upsert(setting, { onConflict: 'setting_key' });
+          .upsert(
+            {
+              setting_key: setting.setting_key,
+              setting_value: setting.setting_value,
+            },
+            { onConflict: 'setting_key' }
+          );
 
         if (error) throw error;
       }
 
       toast({
         title: "Success",
-        description: "All settings saved successfully",
+        description: "All text settings saved successfully",
       });
+      
+      fetchData();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -207,124 +249,105 @@ const SiteSettings = () => {
           Site Settings
         </h1>
 
-        {/* Hero Section Settings */}
-        <Card className="glass-effect mb-8 border-primary/20">
-          <CardHeader>
-            <CardTitle>Hero Section</CardTitle>
-            <CardDescription>Edit hero section text and server status</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="heroTitle">Hero Title</Label>
-              <Input
-                id="heroTitle"
-                value={heroTitle}
-                onChange={(e) => setHeroTitle(e.target.value)}
-                placeholder="BuildMC"
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label htmlFor="heroSubtitle">Hero Subtitle</Label>
-              <Input
-                id="heroSubtitle"
-                value={heroSubtitle}
-                onChange={(e) => setHeroSubtitle(e.target.value)}
-                placeholder="Premium Ranks • Exclusive Kits • Epic Items"
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label htmlFor="serverStatus">Server Status Badge</Label>
-              <Input
-                id="serverStatus"
-                value={serverStatus}
-                onChange={(e) => setServerStatus(e.target.value)}
-                placeholder="Server Online • 247 Players"
-                className="mt-2"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Statistics Settings */}
-        <Card className="glass-effect mb-8 border-primary/20">
-          <CardHeader>
-            <CardTitle>Server Statistics</CardTitle>
-            <CardDescription>Edit the statistics shown on the shop page</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="activePlayers">Active Players</Label>
-              <Input
-                id="activePlayers"
-                value={activePlayers}
-                onChange={(e) => setActivePlayers(e.target.value)}
-                placeholder="15K+"
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label htmlFor="eventsHosted">Events Hosted</Label>
-              <Input
-                id="eventsHosted"
-                value={eventsHosted}
-                onChange={(e) => setEventsHosted(e.target.value)}
-                placeholder="500+"
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label htmlFor="uptime">Uptime</Label>
-              <Input
-                id="uptime"
-                value={uptime}
-                onChange={(e) => setUptime(e.target.value)}
-                placeholder="24/7"
-                className="mt-2"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Social Links */}
+        {/* Text Content Management */}
         <Card className="glass-effect mb-8 border-primary/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <ExternalLink className="w-5 h-5" />
-              Social Links
+              <Type className="w-5 h-5" />
+              Website Text Content
             </CardTitle>
-            <CardDescription>Manage Discord and YouTube links</CardDescription>
+            <CardDescription>
+              Manage all text content including Active Players, Events Hosted, Uptime, hero text, and more
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="discord">Discord URL</Label>
-              <Input
-                id="discord"
-                value={discordUrl}
-                onChange={(e) => setDiscordUrl(e.target.value)}
-                placeholder="https://discord.gg/buildmc"
-                className="mt-2"
-              />
+          <CardContent className="space-y-6">
+            {/* Existing Settings */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg">Current Settings</h3>
+              {textSettings.map((setting) => (
+                <div key={setting.id} className="p-4 bg-card/50 rounded-lg border border-border/50 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1 space-y-2">
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Setting Key</Label>
+                        <Input
+                          value={setting.setting_key}
+                          onChange={(e) => updateTextSetting(setting.id!, "setting_key", e.target.value)}
+                          placeholder="e.g., active_players"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Value</Label>
+                        <Textarea
+                          value={setting.setting_value}
+                          onChange={(e) => updateTextSetting(setting.id!, "setting_value", e.target.value)}
+                          placeholder="e.g., 15K+"
+                          className="mt-1 min-h-[60px]"
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => deleteTextSetting(setting.id!, setting.setting_key)}
+                      className="ml-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div>
-              <Label htmlFor="youtube">YouTube URL</Label>
-              <Input
-                id="youtube"
-                value={youtubeUrl}
-                onChange={(e) => setYoutubeUrl(e.target.value)}
-                placeholder="https://youtube.com/@buildmc"
-                className="mt-2"
-              />
+
+            {/* Add New Setting */}
+            <div className="border-t pt-6 space-y-4">
+              <h3 className="font-semibold text-lg">Add New Setting</h3>
+              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20 space-y-3">
+                <div>
+                  <Label htmlFor="newKey">Setting Key</Label>
+                  <Input
+                    id="newKey"
+                    value={newSettingKey}
+                    onChange={(e) => setNewSettingKey(e.target.value)}
+                    placeholder="e.g., active_players, hero_title, etc."
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="newValue">Value</Label>
+                  <Textarea
+                    id="newValue"
+                    value={newSettingValue}
+                    onChange={(e) => setNewSettingValue(e.target.value)}
+                    placeholder="e.g., 15K+, BuildMC, etc."
+                    className="mt-2 min-h-[80px]"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="newDescription">Description (Optional)</Label>
+                  <Input
+                    id="newDescription"
+                    value={newSettingDescription}
+                    onChange={(e) => setNewSettingDescription(e.target.value)}
+                    placeholder="What this setting controls"
+                    className="mt-2"
+                  />
+                </div>
+                <Button onClick={addTextSetting} className="w-full">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Setting
+                </Button>
+              </div>
             </div>
+
+            {/* Save Button */}
+            <Button onClick={saveTextSettings} size="lg" className="w-full">
+              <Save className="w-4 h-4 mr-2" />
+              Save All Text Settings
+            </Button>
           </CardContent>
         </Card>
-
-        {/* Save All Button */}
-        <Button onClick={saveSettings} size="lg" className="w-full mb-8">
-          <Save className="w-4 h-4 mr-2" />
-          Save All Settings
-        </Button>
 
         {/* Quick Links */}
         <Card className="glass-effect border-primary/20">
