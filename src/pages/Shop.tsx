@@ -46,6 +46,12 @@ const Shop = () => {
   const [quickLinks, setQuickLinks] = useState<QuickLink[]>([]);
   const [discordUrl, setDiscordUrl] = useState('https://discord.gg/buildmc');
   const [youtubeUrl, setYoutubeUrl] = useState('https://youtube.com/@buildmc');
+  const [activePlayers, setActivePlayers] = useState('15K+');
+  const [eventsHosted, setEventsHosted] = useState('500+');
+  const [uptime, setUptime] = useState('24/7');
+  const [heroTitle, setHeroTitle] = useState('BuildMC');
+  const [heroSubtitle, setHeroSubtitle] = useState('Premium Ranks • Exclusive Kits • Epic Items');
+  const [serverStatus, setServerStatus] = useState('Server Online • 247 Players');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [copied, setCopied] = useState(false);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
@@ -116,9 +122,21 @@ const Shop = () => {
       const settings = data as SiteSetting[];
       const discord = settings.find(s => s.setting_key === 'discord_url');
       const youtube = settings.find(s => s.setting_key === 'youtube_url');
+      const players = settings.find(s => s.setting_key === 'active_players');
+      const events = settings.find(s => s.setting_key === 'events_hosted');
+      const uptimeVal = settings.find(s => s.setting_key === 'uptime');
+      const title = settings.find(s => s.setting_key === 'hero_title');
+      const subtitle = settings.find(s => s.setting_key === 'hero_subtitle');
+      const status = settings.find(s => s.setting_key === 'server_status');
       
       if (discord) setDiscordUrl(discord.setting_value);
       if (youtube) setYoutubeUrl(youtube.setting_value);
+      if (players) setActivePlayers(players.setting_value);
+      if (events) setEventsHosted(events.setting_value);
+      if (uptimeVal) setUptime(uptimeVal.setting_value);
+      if (title) setHeroTitle(title.setting_value);
+      if (subtitle) setHeroSubtitle(subtitle.setting_value);
+      if (status) setServerStatus(status.setting_value);
     }
   };
 
@@ -175,19 +193,19 @@ const Shop = () => {
             <div className="inline-block mb-4">
               <div className="glass-effect flex items-center gap-3 rounded-full px-6 py-3 neon-border">
                 <div className="w-3 h-3 bg-primary rounded-full animate-pulse glow-effect" />
-                <span className="text-primary font-bold text-base">Server Online • 247 Players</span>
+                <span className="text-primary font-bold text-base">{serverStatus}</span>
               </div>
             </div>
 
             {/* BuildMC Logo Text */}
             <h1 className="text-7xl md:text-9xl font-black tracking-tight">
               <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent animate-float drop-shadow-2xl">
-                BuildMC
+                {heroTitle}
               </span>
             </h1>
 
             <p className="text-2xl md:text-4xl text-foreground/90 font-semibold max-w-3xl mx-auto leading-relaxed">
-              Premium Ranks • Exclusive Kits • Epic Items
+              {heroSubtitle}
             </p>
 
             {/* Server IP Card */}
@@ -365,7 +383,7 @@ const Shop = () => {
               <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-primary/20 flex items-center justify-center glow-effect group-hover:scale-110 transition-all">
                 <Users className="w-10 h-10 text-primary" />
               </div>
-              <h3 className="text-3xl font-black text-primary mb-2">15K+</h3>
+              <h3 className="text-3xl font-black text-primary mb-2">{activePlayers}</h3>
               <p className="text-lg font-semibold text-foreground mb-1">Active Players</p>
               <p className="text-sm text-muted-foreground">Join our amazing community</p>
             </Card>
@@ -374,7 +392,7 @@ const Shop = () => {
               <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-secondary/20 flex items-center justify-center glow-secondary group-hover:scale-110 transition-all">
                 <Trophy className="w-10 h-10 text-secondary" />
               </div>
-              <h3 className="text-3xl font-black text-secondary mb-2">500+</h3>
+              <h3 className="text-3xl font-black text-secondary mb-2">{eventsHosted}</h3>
               <p className="text-lg font-semibold text-foreground mb-1">Events Hosted</p>
               <p className="text-sm text-muted-foreground">Epic competitions & prizes</p>
             </Card>
@@ -383,7 +401,7 @@ const Shop = () => {
               <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-accent/20 flex items-center justify-center glow-effect group-hover:scale-110 transition-all">
                 <Sparkles className="w-10 h-10 text-accent" />
               </div>
-              <h3 className="text-3xl font-black text-accent mb-2">24/7</h3>
+              <h3 className="text-3xl font-black text-accent mb-2">{uptime}</h3>
               <p className="text-lg font-semibold text-foreground mb-1">Uptime</p>
               <p className="text-sm text-muted-foreground">Always online, always fun</p>
             </Card>

@@ -29,6 +29,12 @@ const SiteSettings = () => {
   const [quickLinks, setQuickLinks] = useState<QuickLink[]>([]);
   const [discordUrl, setDiscordUrl] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [activePlayers, setActivePlayers] = useState("15K+");
+  const [eventsHosted, setEventsHosted] = useState("500+");
+  const [uptime, setUptime] = useState("24/7");
+  const [heroTitle, setHeroTitle] = useState("BuildMC");
+  const [heroSubtitle, setHeroSubtitle] = useState("Premium Ranks • Exclusive Kits • Epic Items");
+  const [serverStatus, setServerStatus] = useState("Server Online • 247 Players");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,6 +66,12 @@ const SiteSettings = () => {
       const settings = settingsData as SiteSetting[];
       setDiscordUrl(settings.find(s => s.setting_key === "discord_url")?.setting_value || "");
       setYoutubeUrl(settings.find(s => s.setting_key === "youtube_url")?.setting_value || "");
+      setActivePlayers(settings.find(s => s.setting_key === "active_players")?.setting_value || "15K+");
+      setEventsHosted(settings.find(s => s.setting_key === "events_hosted")?.setting_value || "500+");
+      setUptime(settings.find(s => s.setting_key === "uptime")?.setting_value || "24/7");
+      setHeroTitle(settings.find(s => s.setting_key === "hero_title")?.setting_value || "BuildMC");
+      setHeroSubtitle(settings.find(s => s.setting_key === "hero_subtitle")?.setting_value || "Premium Ranks • Exclusive Kits • Epic Items");
+      setServerStatus(settings.find(s => s.setting_key === "server_status")?.setting_value || "Server Online • 247 Players");
     } catch (error: any) {
       toast({
         title: "Error",
@@ -142,29 +154,30 @@ const SiteSettings = () => {
     }
   };
 
-  const saveSocialLinks = async () => {
+  const saveSettings = async () => {
     try {
-      const { error: discordError } = await supabase
-        .from("site_settings")
-        .upsert(
-          { setting_key: "discord_url", setting_value: discordUrl },
-          { onConflict: 'setting_key' }
-        );
+      const settingsToSave = [
+        { setting_key: "discord_url", setting_value: discordUrl },
+        { setting_key: "youtube_url", setting_value: youtubeUrl },
+        { setting_key: "active_players", setting_value: activePlayers },
+        { setting_key: "events_hosted", setting_value: eventsHosted },
+        { setting_key: "uptime", setting_value: uptime },
+        { setting_key: "hero_title", setting_value: heroTitle },
+        { setting_key: "hero_subtitle", setting_value: heroSubtitle },
+        { setting_key: "server_status", setting_value: serverStatus },
+      ];
 
-      if (discordError) throw discordError;
+      for (const setting of settingsToSave) {
+        const { error } = await supabase
+          .from("site_settings")
+          .upsert(setting, { onConflict: 'setting_key' });
 
-      const { error: youtubeError } = await supabase
-        .from("site_settings")
-        .upsert(
-          { setting_key: "youtube_url", setting_value: youtubeUrl },
-          { onConflict: 'setting_key' }
-        );
-
-      if (youtubeError) throw youtubeError;
+        if (error) throw error;
+      }
 
       toast({
         title: "Success",
-        description: "Social links saved successfully",
+        description: "All settings saved successfully",
       });
     } catch (error: any) {
       toast({
@@ -193,6 +206,86 @@ const SiteSettings = () => {
         <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
           Site Settings
         </h1>
+
+        {/* Hero Section Settings */}
+        <Card className="glass-effect mb-8 border-primary/20">
+          <CardHeader>
+            <CardTitle>Hero Section</CardTitle>
+            <CardDescription>Edit hero section text and server status</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="heroTitle">Hero Title</Label>
+              <Input
+                id="heroTitle"
+                value={heroTitle}
+                onChange={(e) => setHeroTitle(e.target.value)}
+                placeholder="BuildMC"
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="heroSubtitle">Hero Subtitle</Label>
+              <Input
+                id="heroSubtitle"
+                value={heroSubtitle}
+                onChange={(e) => setHeroSubtitle(e.target.value)}
+                placeholder="Premium Ranks • Exclusive Kits • Epic Items"
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="serverStatus">Server Status Badge</Label>
+              <Input
+                id="serverStatus"
+                value={serverStatus}
+                onChange={(e) => setServerStatus(e.target.value)}
+                placeholder="Server Online • 247 Players"
+                className="mt-2"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Statistics Settings */}
+        <Card className="glass-effect mb-8 border-primary/20">
+          <CardHeader>
+            <CardTitle>Server Statistics</CardTitle>
+            <CardDescription>Edit the statistics shown on the shop page</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="activePlayers">Active Players</Label>
+              <Input
+                id="activePlayers"
+                value={activePlayers}
+                onChange={(e) => setActivePlayers(e.target.value)}
+                placeholder="15K+"
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="eventsHosted">Events Hosted</Label>
+              <Input
+                id="eventsHosted"
+                value={eventsHosted}
+                onChange={(e) => setEventsHosted(e.target.value)}
+                placeholder="500+"
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="uptime">Uptime</Label>
+              <Input
+                id="uptime"
+                value={uptime}
+                onChange={(e) => setUptime(e.target.value)}
+                placeholder="24/7"
+                className="mt-2"
+              />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Social Links */}
         <Card className="glass-effect mb-8 border-primary/20">
@@ -224,12 +317,14 @@ const SiteSettings = () => {
                 className="mt-2"
               />
             </div>
-            <Button onClick={saveSocialLinks} className="w-full">
-              <Save className="w-4 h-4 mr-2" />
-              Save Social Links
-            </Button>
           </CardContent>
         </Card>
+
+        {/* Save All Button */}
+        <Button onClick={saveSettings} size="lg" className="w-full mb-8">
+          <Save className="w-4 h-4 mr-2" />
+          Save All Settings
+        </Button>
 
         {/* Quick Links */}
         <Card className="glass-effect border-primary/20">
