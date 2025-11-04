@@ -5,7 +5,8 @@ import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingBag, Shield, Zap, Package, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Shield, Zap, Package, ArrowRight, TrendingUp, Copy, Check } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import heroImage from '@/assets/hero-minecraft.jpg';
 
 interface Product {
@@ -23,14 +24,31 @@ interface Category {
   name: string;
 }
 
+interface StatBox {
+  id: string;
+  icon: string;
+  label: string;
+  value: string;
+  display_order: number;
+}
+
+interface SiteSetting {
+  setting_key: string;
+  setting_value: string;
+}
+
 const Index = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [statBoxes, setStatBoxes] = useState<StatBox[]>([]);
+  const [siteSettings, setSiteSettings] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchProducts();
     fetchCategories();
+    fetchStatBoxes();
+    fetchSiteSettings();
   }, []);
 
   const fetchProducts = async () => {
@@ -56,9 +74,48 @@ const Index = () => {
     }
   };
 
+  const fetchStatBoxes = async () => {
+    const { data, error } = await supabase
+      .from('stat_boxes')
+      .select('*')
+      .order('display_order');
+    
+    if (!error && data) {
+      setStatBoxes(data);
+    }
+  };
+
+  const fetchSiteSettings = async () => {
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('*');
+    
+    if (!error && data) {
+      const settingsMap: Record<string, string> = {};
+      data.forEach((setting: SiteSetting) => {
+        settingsMap[setting.setting_key] = setting.setting_value;
+      });
+      setSiteSettings(settingsMap);
+    }
+  };
+
   const filteredProducts = selectedFilter === 'all'
     ? products
     : products.filter(p => p.category_id === selectedFilter);
+
+  const [copiedIP, setCopiedIP] = useState(false);
+
+  const copyServerIP = () => {
+    const serverIP = siteSettings['server_ip'] || 'play.buildmc.net';
+    navigator.clipboard.writeText(serverIP);
+    setCopiedIP(true);
+    setTimeout(() => setCopiedIP(false), 2000);
+  };
+
+  const getIcon = (iconName: string) => {
+    const IconComponent = (LucideIcons as any)[iconName] || TrendingUp;
+    return IconComponent;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -78,13 +135,13 @@ const Index = () => {
             </div>
             <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
               <span className="bg-gradient-to-r from-primary via-primary-glow to-secondary bg-clip-text text-transparent">
-                Welcome to
+                {siteSettings['hero_greeting'] || 'Welcome to'}
               </span>
               <br />
-              <span className="text-foreground">BuildMC Store</span>
+              <span className="text-foreground">{siteSettings['hero_title'] || 'BuildMC Store'}</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed">
-              Your trusted destination for premium ranks, exclusive items, and epic Minecraft experiences!
+              {siteSettings['hero_subtitle'] || 'Your trusted destination for premium ranks, exclusive items, and epic Minecraft experiences!'}
             </p>
             <div className="flex flex-wrap gap-4">
               <Button asChild size="lg" className="gap-2 text-base px-8 py-6 shadow-lg hover:shadow-xl transition-all glow-effect">
@@ -105,6 +162,72 @@ const Index = () => {
         {/* Floating particles effect */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
       </div>
+
+      {/* Server Info Section */}
+      {(siteSettings['server_ip'] || siteSettings['server_version']) && (
+        <div className="container mx-auto px-4 -mt-16 relative z-10">
+          <div className="bg-card/80 backdrop-blur border border-border rounded-2xl p-6 shadow-xl max-w-2xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
+              {siteSettings['server_ip'] && (
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Shield className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Server IP</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-lg font-bold text-foreground">{siteSettings['server_ip']}</p>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={copyServerIP}
+                        className="h-8 w-8"
+                      >
+                        {copiedIP ? (
+                          <Check className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {siteSettings['server_version'] && (
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center">
+                    <Package className="w-6 h-6 text-secondary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Version</p>
+                    <p className="text-lg font-bold text-foreground">{siteSettings['server_version']}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Stats Section */}
+      {statBoxes.length > 0 && (
+        <div className="container mx-auto px-4 py-20">
+          <div className="grid md:grid-cols-3 gap-8">
+            {statBoxes.map((stat) => {
+              const Icon = getIcon(stat.icon);
+              return (
+                <div key={stat.id} className="text-center p-8 rounded-2xl bg-card/50 backdrop-blur border border-border hover-lift">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                    <Icon className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-4xl font-bold mb-2 text-foreground">{stat.value}</h3>
+                  <p className="text-muted-foreground">{stat.label}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Features Section */}
       <div className="container mx-auto px-4 py-24">
@@ -263,6 +386,28 @@ const Index = () => {
         )}
       </div>
 
+      {/* Story Section */}
+      {siteSettings['story_title'] && (
+        <div className="container mx-auto px-4 pb-16">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              {siteSettings['story_title']}
+            </h2>
+            <p className="text-lg text-muted-foreground mb-8 leading-relaxed whitespace-pre-line">
+              {siteSettings['story_text']}
+            </p>
+            {siteSettings['story_button_text'] && (
+              <Button asChild size="lg" className="gap-2">
+                <Link to={siteSettings['story_button_link'] || '/shop'}>
+                  {siteSettings['story_button_text']}
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* CTA Section */}
       <div className="container mx-auto px-4 pb-24">
         <div className="relative overflow-hidden rounded-3xl p-12 md:p-16 text-center" style={{ background: 'var(--gradient-card)' }}>
@@ -272,15 +417,15 @@ const Index = () => {
           </div>
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              Ready to Get Started?
+              {siteSettings['cta_title'] || 'Ready to Get Started?'}
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of players who trust BuildMC Store for their premium Minecraft needs
+              {siteSettings['cta_subtitle'] || 'Join thousands of players who trust BuildMC Store for their premium Minecraft needs'}
             </p>
             <Button asChild size="lg" className="gap-2 text-base px-10 py-6 shadow-xl glow-effect">
               <Link to="/shop">
                 <ShoppingBag className="w-5 h-5" />
-                Explore Products
+                {siteSettings['cta_button_text'] || 'Explore Products'}
               </Link>
             </Button>
           </div>

@@ -18,6 +18,14 @@ interface QuickLink {
   display_order: number;
 }
 
+interface StatBox {
+  id: string;
+  icon: string;
+  label: string;
+  value: string;
+  display_order: number;
+}
+
 interface SiteSetting {
   id?: string;
   setting_key: string;
@@ -31,6 +39,7 @@ const SiteSettings = () => {
   const { toast } = useToast();
   const [quickLinks, setQuickLinks] = useState<QuickLink[]>([]);
   const [textSettings, setTextSettings] = useState<SiteSetting[]>([]);
+  const [statBoxes, setStatBoxes] = useState<StatBox[]>([]);
   const [newSettingKey, setNewSettingKey] = useState("");
   const [newSettingValue, setNewSettingValue] = useState("");
   const [newSettingDescription, setNewSettingDescription] = useState("");
@@ -64,6 +73,15 @@ const SiteSettings = () => {
       if (settingsError) throw settingsError;
       
       setTextSettings(settingsData || []);
+
+      // Fetch stat boxes
+      const { data: statBoxesData, error: statBoxesError } = await supabase
+        .from("stat_boxes")
+        .select("*")
+        .order("display_order");
+
+      if (statBoxesError) throw statBoxesError;
+      setStatBoxes(statBoxesData || []);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -230,6 +248,79 @@ const SiteSettings = () => {
     }
   };
 
+  // Stat Box Management
+  const addStatBox = () => {
+    const newOrder = statBoxes.length > 0 ? Math.max(...statBoxes.map(s => s.display_order)) + 1 : 0;
+    setStatBoxes([...statBoxes, { 
+      id: crypto.randomUUID(), 
+      icon: "TrendingUp",
+      label: "", 
+      value: "", 
+      display_order: newOrder 
+    }]);
+  };
+
+  const updateStatBox = (id: string, field: keyof StatBox, value: string | number) => {
+    setStatBoxes(statBoxes.map(box => 
+      box.id === id ? { ...box, [field]: value } : box
+    ));
+  };
+
+  const deleteStatBox = async (id: string) => {
+    if (id.length === 36 && id.includes("-")) {
+      const { error } = await supabase
+        .from("stat_boxes")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    setStatBoxes(statBoxes.filter(box => box.id !== id));
+  };
+
+  const saveStatBoxes = async () => {
+    try {
+      // Delete all existing stat boxes and insert new ones
+      const { error: deleteError } = await supabase
+        .from("stat_boxes")
+        .delete()
+        .neq("id", "00000000-0000-0000-0000-000000000000");
+
+      if (deleteError) throw deleteError;
+
+      // Filter out empty stat boxes
+      const validBoxes = statBoxes.filter(box => box.label && box.value);
+
+      if (validBoxes.length > 0) {
+        const { error: insertError } = await supabase
+          .from("stat_boxes")
+          .insert(validBoxes.map(({ id, ...box }) => box));
+
+        if (insertError) throw insertError;
+      }
+
+      toast({
+        title: "Success",
+        description: "Stat boxes saved successfully",
+      });
+      
+      fetchData();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -346,6 +437,59 @@ const SiteSettings = () => {
               <Save className="w-4 h-4 mr-2" />
               Save All Text Settings
             </Button>
+          </CardContent>
+        </Card>
+
+        {/* Stat Boxes Management */}
+        <Card className="glass-effect mb-8 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Type className="w-5 h-5" />
+              Homepage Statistics
+            </CardTitle>
+            <CardDescription>
+              Manage the stat boxes (Active Players, Events Hosted, Uptime, etc.)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {statBoxes.map((box) => (
+              <div key={box.id} className="flex gap-2 items-start p-4 bg-card/50 rounded-lg border border-border/50">
+                <div className="flex-1 space-y-2">
+                  <Input
+                    placeholder="Icon Name (e.g., Users, Calendar, Clock)"
+                    value={box.icon}
+                    onChange={(e) => updateStatBox(box.id, "icon", e.target.value)}
+                  />
+                  <Input
+                    placeholder="Label (e.g., Active Players)"
+                    value={box.label}
+                    onChange={(e) => updateStatBox(box.id, "label", e.target.value)}
+                  />
+                  <Input
+                    placeholder="Value (e.g., 15K+)"
+                    value={box.value}
+                    onChange={(e) => updateStatBox(box.id, "value", e.target.value)}
+                  />
+                </div>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  onClick={() => deleteStatBox(box.id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+            <div className="flex gap-2">
+              <Button onClick={addStatBox} variant="outline" className="flex-1">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Stat Box
+              </Button>
+              <Button onClick={saveStatBoxes} className="flex-1">
+                <Save className="w-4 h-4 mr-2" />
+                Save Stat Boxes
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
