@@ -38,12 +38,29 @@ const SiteSettings = () => {
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const [quickLinks, setQuickLinks] = useState<QuickLink[]>([]);
-  const [textSettings, setTextSettings] = useState<SiteSetting[]>([]);
   const [statBoxes, setStatBoxes] = useState<StatBox[]>([]);
-  const [newSettingKey, setNewSettingKey] = useState("");
-  const [newSettingValue, setNewSettingValue] = useState("");
-  const [newSettingDescription, setNewSettingDescription] = useState("");
   const [loading, setLoading] = useState(true);
+  
+  // Our Story fields
+  const [storyTitle, setStoryTitle] = useState("");
+  const [storyText, setStoryText] = useState("");
+  const [storyButtonText, setStoryButtonText] = useState("");
+  const [storyButtonUrl, setStoryButtonUrl] = useState("");
+  
+  // Server Info fields
+  const [serverIp, setServerIp] = useState("");
+  const [serverVersion, setServerVersion] = useState("");
+  
+  // Hero Section fields
+  const [heroGreeting, setHeroGreeting] = useState("");
+  const [heroTitle, setHeroTitle] = useState("");
+  const [heroSubtitle, setHeroSubtitle] = useState("");
+  const [heroButtonText, setHeroButtonText] = useState("");
+  
+  // CTA Section fields
+  const [ctaTitle, setCtaTitle] = useState("");
+  const [ctaSubtitle, setCtaSubtitle] = useState("");
+  const [ctaButtonText, setCtaButtonText] = useState("");
 
   useEffect(() => {
     if (!user || !isAdmin) {
@@ -67,12 +84,29 @@ const SiteSettings = () => {
       // Fetch site settings
       const { data: settingsData, error: settingsError } = await supabase
         .from("site_settings")
-        .select("*")
-        .order("setting_key");
+        .select("*");
 
       if (settingsError) throw settingsError;
       
-      setTextSettings(settingsData || []);
+      // Map settings to state
+      const settingsMap = settingsData?.reduce((acc, setting) => {
+        acc[setting.setting_key] = setting.setting_value;
+        return acc;
+      }, {} as Record<string, string>) || {};
+      
+      setStoryTitle(settingsMap.story_title || "");
+      setStoryText(settingsMap.story_text || "");
+      setStoryButtonText(settingsMap.story_button_text || "");
+      setStoryButtonUrl(settingsMap.story_button_url || "");
+      setServerIp(settingsMap.server_ip || "");
+      setServerVersion(settingsMap.server_version || "");
+      setHeroGreeting(settingsMap.hero_greeting || "");
+      setHeroTitle(settingsMap.hero_title || "");
+      setHeroSubtitle(settingsMap.hero_subtitle || "");
+      setHeroButtonText(settingsMap.hero_button_text || "");
+      setCtaTitle(settingsMap.cta_title || "");
+      setCtaSubtitle(settingsMap.cta_subtitle || "");
+      setCtaButtonText(settingsMap.cta_button_text || "");
 
       // Fetch stat boxes
       const { data: statBoxesData, error: statBoxesError } = await supabase
@@ -164,78 +198,35 @@ const SiteSettings = () => {
     }
   };
 
-  const updateTextSetting = (id: string, field: keyof SiteSetting, value: string) => {
-    setTextSettings(textSettings.map(setting =>
-      setting.id === id ? { ...setting, [field]: value } : setting
-    ));
-  };
-
-  const addTextSetting = () => {
-    if (!newSettingKey || !newSettingValue) {
-      toast({
-        title: "Error",
-        description: "Please fill in both key and value",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const newSetting: SiteSetting = {
-      id: crypto.randomUUID(),
-      setting_key: newSettingKey,
-      setting_value: newSettingValue,
-      description: newSettingDescription || undefined,
-    };
-
-    setTextSettings([...textSettings, newSetting]);
-    setNewSettingKey("");
-    setNewSettingValue("");
-    setNewSettingDescription("");
-  };
-
-  const deleteTextSetting = async (id: string, settingKey: string) => {
+  const saveAllSettings = async () => {
     try {
-      const { error } = await supabase
-        .from("site_settings")
-        .delete()
-        .eq("setting_key", settingKey);
+      const settings = [
+        { setting_key: "story_title", setting_value: storyTitle },
+        { setting_key: "story_text", setting_value: storyText },
+        { setting_key: "story_button_text", setting_value: storyButtonText },
+        { setting_key: "story_button_url", setting_value: storyButtonUrl },
+        { setting_key: "server_ip", setting_value: serverIp },
+        { setting_key: "server_version", setting_value: serverVersion },
+        { setting_key: "hero_greeting", setting_value: heroGreeting },
+        { setting_key: "hero_title", setting_value: heroTitle },
+        { setting_key: "hero_subtitle", setting_value: heroSubtitle },
+        { setting_key: "hero_button_text", setting_value: heroButtonText },
+        { setting_key: "cta_title", setting_value: ctaTitle },
+        { setting_key: "cta_subtitle", setting_value: ctaSubtitle },
+        { setting_key: "cta_button_text", setting_value: ctaButtonText },
+      ];
 
-      if (error) throw error;
-
-      setTextSettings(textSettings.filter(s => s.id !== id));
-      
-      toast({
-        title: "Success",
-        description: "Setting deleted successfully",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const saveTextSettings = async () => {
-    try {
-      for (const setting of textSettings) {
+      for (const setting of settings) {
         const { error } = await supabase
           .from("site_settings")
-          .upsert(
-            {
-              setting_key: setting.setting_key,
-              setting_value: setting.setting_value,
-            },
-            { onConflict: 'setting_key' }
-          );
+          .upsert(setting, { onConflict: 'setting_key' });
 
         if (error) throw error;
       }
 
       toast({
         title: "Success",
-        description: "All text settings saved successfully",
+        description: "All settings saved successfully",
       });
       
       fetchData();
@@ -340,102 +331,189 @@ const SiteSettings = () => {
           Site Settings
         </h1>
 
-        {/* Text Content Management */}
+        {/* Hero Section */}
         <Card className="glass-effect mb-8 border-primary/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Type className="w-5 h-5" />
-              Website Text Content
+              Hero Section
             </CardTitle>
             <CardDescription>
-              Manage all text content including Active Players, Events Hosted, Uptime, hero text, and more
+              Manage the main hero banner text
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Existing Settings */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg">Current Settings</h3>
-              {textSettings.map((setting) => (
-                <div key={setting.id} className="p-4 bg-card/50 rounded-lg border border-border/50 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1 space-y-2">
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Setting Key</Label>
-                        <Input
-                          value={setting.setting_key}
-                          onChange={(e) => updateTextSetting(setting.id!, "setting_key", e.target.value)}
-                          placeholder="e.g., active_players"
-                          className="mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-muted-foreground">Value</Label>
-                        <Textarea
-                          value={setting.setting_value}
-                          onChange={(e) => updateTextSetting(setting.id!, "setting_value", e.target.value)}
-                          placeholder="e.g., 15K+"
-                          className="mt-1 min-h-[60px]"
-                        />
-                      </div>
-                    </div>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => deleteTextSetting(setting.id!, setting.setting_key)}
-                      className="ml-2"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Greeting Text</Label>
+              <Input
+                value={heroGreeting}
+                onChange={(e) => setHeroGreeting(e.target.value)}
+                placeholder="e.g., Welcome to BuildMC"
+                className="mt-2"
+              />
             </div>
-
-            {/* Add New Setting */}
-            <div className="border-t pt-6 space-y-4">
-              <h3 className="font-semibold text-lg">Add New Setting</h3>
-              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20 space-y-3">
-                <div>
-                  <Label htmlFor="newKey">Setting Key</Label>
-                  <Input
-                    id="newKey"
-                    value={newSettingKey}
-                    onChange={(e) => setNewSettingKey(e.target.value)}
-                    placeholder="e.g., active_players, hero_title, etc."
-                    className="mt-2"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="newValue">Value</Label>
-                  <Textarea
-                    id="newValue"
-                    value={newSettingValue}
-                    onChange={(e) => setNewSettingValue(e.target.value)}
-                    placeholder="e.g., 15K+, BuildMC, etc."
-                    className="mt-2 min-h-[80px]"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="newDescription">Description (Optional)</Label>
-                  <Input
-                    id="newDescription"
-                    value={newSettingDescription}
-                    onChange={(e) => setNewSettingDescription(e.target.value)}
-                    placeholder="What this setting controls"
-                    className="mt-2"
-                  />
-                </div>
-                <Button onClick={addTextSetting} className="w-full">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Setting
-                </Button>
-              </div>
+            <div>
+              <Label>Main Title</Label>
+              <Input
+                value={heroTitle}
+                onChange={(e) => setHeroTitle(e.target.value)}
+                placeholder="e.g., Build Your Dreams"
+                className="mt-2"
+              />
             </div>
+            <div>
+              <Label>Subtitle</Label>
+              <Textarea
+                value={heroSubtitle}
+                onChange={(e) => setHeroSubtitle(e.target.value)}
+                placeholder="e.g., Join thousands of players..."
+                className="mt-2 min-h-[80px]"
+              />
+            </div>
+            <div>
+              <Label>Button Text</Label>
+              <Input
+                value={heroButtonText}
+                onChange={(e) => setHeroButtonText(e.target.value)}
+                placeholder="e.g., Start Playing"
+                className="mt-2"
+              />
+            </div>
+          </CardContent>
+        </Card>
 
-            {/* Save Button */}
-            <Button onClick={saveTextSettings} size="lg" className="w-full">
+        {/* Server Info */}
+        <Card className="glass-effect mb-8 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Type className="w-5 h-5" />
+              Server Information
+            </CardTitle>
+            <CardDescription>
+              Manage server IP and version display
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Server IP</Label>
+              <Input
+                value={serverIp}
+                onChange={(e) => setServerIp(e.target.value)}
+                placeholder="e.g., play.buildmc.com"
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label>Server Version</Label>
+              <Input
+                value={serverVersion}
+                onChange={(e) => setServerVersion(e.target.value)}
+                placeholder="e.g., 1.20.x"
+                className="mt-2"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Our Story Section */}
+        <Card className="glass-effect mb-8 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Type className="w-5 h-5" />
+              Our Story Section
+            </CardTitle>
+            <CardDescription>
+              Manage the story section content
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Story Title</Label>
+              <Input
+                value={storyTitle}
+                onChange={(e) => setStoryTitle(e.target.value)}
+                placeholder="e.g., Our Story"
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label>Story Text</Label>
+              <Textarea
+                value={storyText}
+                onChange={(e) => setStoryText(e.target.value)}
+                placeholder="Tell your story..."
+                className="mt-2 min-h-[120px]"
+              />
+            </div>
+            <div>
+              <Label>Button Text</Label>
+              <Input
+                value={storyButtonText}
+                onChange={(e) => setStoryButtonText(e.target.value)}
+                placeholder="e.g., Learn More"
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label>Button URL</Label>
+              <Input
+                value={storyButtonUrl}
+                onChange={(e) => setStoryButtonUrl(e.target.value)}
+                placeholder="e.g., /about"
+                className="mt-2"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* CTA Section */}
+        <Card className="glass-effect mb-8 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Type className="w-5 h-5" />
+              Call-to-Action Section
+            </CardTitle>
+            <CardDescription>
+              Manage the bottom CTA section
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>CTA Title</Label>
+              <Input
+                value={ctaTitle}
+                onChange={(e) => setCtaTitle(e.target.value)}
+                placeholder="e.g., Ready to Start?"
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label>CTA Subtitle</Label>
+              <Textarea
+                value={ctaSubtitle}
+                onChange={(e) => setCtaSubtitle(e.target.value)}
+                placeholder="e.g., Join our community..."
+                className="mt-2 min-h-[60px]"
+              />
+            </div>
+            <div>
+              <Label>Button Text</Label>
+              <Input
+                value={ctaButtonText}
+                onChange={(e) => setCtaButtonText(e.target.value)}
+                placeholder="e.g., Join Now"
+                className="mt-2"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Save All Button */}
+        <Card className="glass-effect mb-8 border-primary/20">
+          <CardContent className="pt-6">
+            <Button onClick={saveAllSettings} size="lg" className="w-full">
               <Save className="w-4 h-4 mr-2" />
-              Save All Text Settings
+              Save All Website Settings
             </Button>
           </CardContent>
         </Card>
