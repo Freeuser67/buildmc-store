@@ -200,6 +200,7 @@ const SiteSettings = () => {
 
   const saveAllSettings = async () => {
     try {
+      console.log("Saving all settings...");
       const settings = [
         { setting_key: "story_title", setting_value: storyTitle },
         { setting_key: "story_text", setting_value: storyText },
@@ -216,11 +217,15 @@ const SiteSettings = () => {
         { setting_key: "cta_button_text", setting_value: ctaButtonText },
       ];
 
-      for (const setting of settings) {
-        const { error } = await supabase
-          .from("site_settings")
-          .upsert(setting, { onConflict: 'setting_key' });
+      console.log("Settings to save:", settings);
 
+      for (const setting of settings) {
+        const { data, error } = await supabase
+          .from("site_settings")
+          .upsert(setting, { onConflict: 'setting_key' })
+          .select();
+
+        console.log("Upsert result for", setting.setting_key, ":", data, error);
         if (error) throw error;
       }
 
@@ -229,8 +234,9 @@ const SiteSettings = () => {
         description: "All settings saved successfully",
       });
       
-      fetchData();
+      await fetchData();
     } catch (error: any) {
+      console.error("Save settings error:", error);
       toast({
         title: "Error",
         description: error.message,
@@ -278,22 +284,30 @@ const SiteSettings = () => {
 
   const saveStatBoxes = async () => {
     try {
+      console.log("Saving stat boxes:", statBoxes);
+      
       // Delete all existing stat boxes and insert new ones
       const { error: deleteError } = await supabase
         .from("stat_boxes")
         .delete()
-        .neq("id", "00000000-0000-0000-0000-000000000000");
+        .gte("id", "00000000-0000-0000-0000-000000000000");
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error("Delete error:", deleteError);
+        throw deleteError;
+      }
 
       // Filter out empty stat boxes
       const validBoxes = statBoxes.filter(box => box.label && box.value);
+      console.log("Valid boxes to insert:", validBoxes);
 
       if (validBoxes.length > 0) {
-        const { error: insertError } = await supabase
+        const { data, error: insertError } = await supabase
           .from("stat_boxes")
-          .insert(validBoxes.map(({ id, ...box }) => box));
+          .insert(validBoxes.map(({ id, ...box }) => box))
+          .select();
 
+        console.log("Insert result:", data, insertError);
         if (insertError) throw insertError;
       }
 
@@ -302,8 +316,9 @@ const SiteSettings = () => {
         description: "Stat boxes saved successfully",
       });
       
-      fetchData();
+      await fetchData();
     } catch (error: any) {
+      console.error("Save stat boxes error:", error);
       toast({
         title: "Error",
         description: error.message,

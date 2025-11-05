@@ -398,7 +398,7 @@ const Index = () => {
             </p>
             {siteSettings['story_button_text'] && (
               <Button asChild size="lg" className="gap-2">
-                <Link to={siteSettings['story_button_link'] || '/shop'}>
+                <Link to={siteSettings['story_button_url'] || '/shop'}>
                   {siteSettings['story_button_text']}
                   <ArrowRight className="w-5 h-5" />
                 </Link>
