@@ -4,12 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Save, ExternalLink, Type } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
+import { Save } from "lucide-react";
+import { HeroSettingsSection } from "@/components/admin/HeroSettingsSection";
+import { ServerInfoSection } from "@/components/admin/ServerInfoSection";
+import { StorySection } from "@/components/admin/StorySection";
+import { CTASection } from "@/components/admin/CTASection";
+import { StatBoxesSection } from "@/components/admin/StatBoxesSection";
+import { QuickLinksSection } from "@/components/admin/QuickLinksSection";
 
 interface QuickLink {
   id: string;
@@ -346,182 +349,43 @@ const SiteSettings = () => {
           Site Settings
         </h1>
 
-        {/* Hero Section */}
-        <Card className="glass-effect mb-8 border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Type className="w-5 h-5" />
-              Hero Section
-            </CardTitle>
-            <CardDescription>
-              Manage the main hero banner text
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Greeting Text</Label>
-              <Input
-                value={heroGreeting}
-                onChange={(e) => setHeroGreeting(e.target.value)}
-                placeholder="e.g., Welcome to BuildMC"
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label>Main Title</Label>
-              <Input
-                value={heroTitle}
-                onChange={(e) => setHeroTitle(e.target.value)}
-                placeholder="e.g., Build Your Dreams"
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label>Subtitle</Label>
-              <Textarea
-                value={heroSubtitle}
-                onChange={(e) => setHeroSubtitle(e.target.value)}
-                placeholder="e.g., Join thousands of players..."
-                className="mt-2 min-h-[80px]"
-              />
-            </div>
-            <div>
-              <Label>Button Text</Label>
-              <Input
-                value={heroButtonText}
-                onChange={(e) => setHeroButtonText(e.target.value)}
-                placeholder="e.g., Start Playing"
-                className="mt-2"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <HeroSettingsSection
+          heroGreeting={heroGreeting}
+          setHeroGreeting={setHeroGreeting}
+          heroTitle={heroTitle}
+          setHeroTitle={setHeroTitle}
+          heroSubtitle={heroSubtitle}
+          setHeroSubtitle={setHeroSubtitle}
+          heroButtonText={heroButtonText}
+          setHeroButtonText={setHeroButtonText}
+        />
 
-        {/* Server Info */}
-        <Card className="glass-effect mb-8 border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Type className="w-5 h-5" />
-              Server Information
-            </CardTitle>
-            <CardDescription>
-              Manage server IP and version display
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Server IP</Label>
-              <Input
-                value={serverIp}
-                onChange={(e) => setServerIp(e.target.value)}
-                placeholder="e.g., play.buildmc.com"
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label>Server Version</Label>
-              <Input
-                value={serverVersion}
-                onChange={(e) => setServerVersion(e.target.value)}
-                placeholder="e.g., 1.20.x"
-                className="mt-2"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <ServerInfoSection
+          serverIp={serverIp}
+          setServerIp={setServerIp}
+          serverVersion={serverVersion}
+          setServerVersion={setServerVersion}
+        />
 
-        {/* Our Story Section */}
-        <Card className="glass-effect mb-8 border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Type className="w-5 h-5" />
-              Our Story Section
-            </CardTitle>
-            <CardDescription>
-              Manage the story section content
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Story Title</Label>
-              <Input
-                value={storyTitle}
-                onChange={(e) => setStoryTitle(e.target.value)}
-                placeholder="e.g., Our Story"
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label>Story Text</Label>
-              <Textarea
-                value={storyText}
-                onChange={(e) => setStoryText(e.target.value)}
-                placeholder="Tell your story..."
-                className="mt-2 min-h-[120px]"
-              />
-            </div>
-            <div>
-              <Label>Button Text</Label>
-              <Input
-                value={storyButtonText}
-                onChange={(e) => setStoryButtonText(e.target.value)}
-                placeholder="e.g., Learn More"
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label>Button URL</Label>
-              <Input
-                value={storyButtonUrl}
-                onChange={(e) => setStoryButtonUrl(e.target.value)}
-                placeholder="e.g., /about"
-                className="mt-2"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <StorySection
+          storyTitle={storyTitle}
+          setStoryTitle={setStoryTitle}
+          storyText={storyText}
+          setStoryText={setStoryText}
+          storyButtonText={storyButtonText}
+          setStoryButtonText={setStoryButtonText}
+          storyButtonUrl={storyButtonUrl}
+          setStoryButtonUrl={setStoryButtonUrl}
+        />
 
-        {/* CTA Section */}
-        <Card className="glass-effect mb-8 border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Type className="w-5 h-5" />
-              Call-to-Action Section
-            </CardTitle>
-            <CardDescription>
-              Manage the bottom CTA section
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>CTA Title</Label>
-              <Input
-                value={ctaTitle}
-                onChange={(e) => setCtaTitle(e.target.value)}
-                placeholder="e.g., Ready to Start?"
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label>CTA Subtitle</Label>
-              <Textarea
-                value={ctaSubtitle}
-                onChange={(e) => setCtaSubtitle(e.target.value)}
-                placeholder="e.g., Join our community..."
-                className="mt-2 min-h-[60px]"
-              />
-            </div>
-            <div>
-              <Label>Button Text</Label>
-              <Input
-                value={ctaButtonText}
-                onChange={(e) => setCtaButtonText(e.target.value)}
-                placeholder="e.g., Join Now"
-                className="mt-2"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <CTASection
+          ctaTitle={ctaTitle}
+          setCtaTitle={setCtaTitle}
+          ctaSubtitle={ctaSubtitle}
+          setCtaSubtitle={setCtaSubtitle}
+          ctaButtonText={ctaButtonText}
+          setCtaButtonText={setCtaButtonText}
+        />
 
         {/* Save All Button */}
         <Card className="glass-effect mb-8 border-primary/20">
@@ -533,101 +397,21 @@ const SiteSettings = () => {
           </CardContent>
         </Card>
 
-        {/* Stat Boxes Management */}
-        <Card className="glass-effect mb-8 border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Type className="w-5 h-5" />
-              Homepage Statistics
-            </CardTitle>
-            <CardDescription>
-              Manage the stat boxes (Active Players, Events Hosted, Uptime, etc.)
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {statBoxes.map((box) => (
-              <div key={box.id} className="flex gap-2 items-start p-4 bg-card/50 rounded-lg border border-border/50">
-                <div className="flex-1 space-y-2">
-                  <Input
-                    placeholder="Icon Name (e.g., Users, Calendar, Clock)"
-                    value={box.icon}
-                    onChange={(e) => updateStatBox(box.id, "icon", e.target.value)}
-                  />
-                  <Input
-                    placeholder="Label (e.g., Active Players)"
-                    value={box.label}
-                    onChange={(e) => updateStatBox(box.id, "label", e.target.value)}
-                  />
-                  <Input
-                    placeholder="Value (e.g., 15K+)"
-                    value={box.value}
-                    onChange={(e) => updateStatBox(box.id, "value", e.target.value)}
-                  />
-                </div>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => deleteStatBox(box.id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-            <div className="flex gap-2">
-              <Button onClick={addStatBox} variant="outline" className="flex-1">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Stat Box
-              </Button>
-              <Button onClick={saveStatBoxes} className="flex-1">
-                <Save className="w-4 h-4 mr-2" />
-                Save Stat Boxes
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <StatBoxesSection
+          statBoxes={statBoxes}
+          onAdd={addStatBox}
+          onUpdate={updateStatBox}
+          onDelete={deleteStatBox}
+          onSave={saveStatBoxes}
+        />
 
-        {/* Quick Links */}
-        <Card className="glass-effect border-primary/20">
-          <CardHeader>
-            <CardTitle>Quick Links</CardTitle>
-            <CardDescription>Manage footer quick links</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {quickLinks.map((link, index) => (
-              <div key={link.id} className="flex gap-2 items-start p-4 bg-card/50 rounded-lg border border-border/50">
-                <div className="flex-1 space-y-2">
-                  <Input
-                    placeholder="Link Title"
-                    value={link.title}
-                    onChange={(e) => updateQuickLink(link.id, "title", e.target.value)}
-                  />
-                  <Input
-                    placeholder="https://..."
-                    value={link.url}
-                    onChange={(e) => updateQuickLink(link.id, "url", e.target.value)}
-                  />
-                </div>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => deleteQuickLink(link.id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-            <div className="flex gap-2">
-              <Button onClick={addQuickLink} variant="outline" className="flex-1">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Link
-              </Button>
-              <Button onClick={saveQuickLinks} className="flex-1">
-                <Save className="w-4 h-4 mr-2" />
-                Save Quick Links
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <QuickLinksSection
+          quickLinks={quickLinks}
+          onAdd={addQuickLink}
+          onUpdate={updateQuickLink}
+          onDelete={deleteQuickLink}
+          onSave={saveQuickLinks}
+        />
       </div>
     </div>
   );
