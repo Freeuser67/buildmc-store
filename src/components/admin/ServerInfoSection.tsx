@@ -8,6 +8,8 @@ interface ServerInfoSectionProps {
   setServerIp: (value: string) => void;
   serverVersion: string;
   setServerVersion: (value: string) => void;
+  discordServerId: string;
+  setDiscordServerId: (value: string) => void;
 }
 
 export const ServerInfoSection = ({
@@ -15,6 +17,8 @@ export const ServerInfoSection = ({
   setServerIp,
   serverVersion,
   setServerVersion,
+  discordServerId,
+  setDiscordServerId,
 }: ServerInfoSectionProps) => {
   return (
     <Card className="glass-effect mb-8 border-primary/20">
@@ -45,6 +49,18 @@ export const ServerInfoSection = ({
             placeholder="e.g., 1.20.x"
             className="mt-2"
           />
+        </div>
+        <div>
+          <Label>Discord Server ID</Label>
+          <Input
+            value={discordServerId}
+            onChange={(e) => setDiscordServerId(e.target.value)}
+            placeholder="e.g., 1234567890123456789"
+            className="mt-2"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Get your server ID from Discord Server Settings → Widget → Enable Widget
+          </p>
         </div>
       </CardContent>
     </Card>
