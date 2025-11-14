@@ -277,7 +277,7 @@ const Index = () => {
           </p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <div className="group text-center p-8 rounded-2xl bg-card/50 backdrop-blur border border-border hover-lift hover:border-primary/50 transition-all">
             <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Shield className="w-10 h-10 text-primary animate-float" />
@@ -293,14 +293,6 @@ const Index = () => {
             <h3 className="text-2xl font-bold mb-3 text-foreground">Instant Delivery</h3>
             <p className="text-muted-foreground leading-relaxed">Get your purchases delivered instantly to your account without delays</p>
           </div>
-          
-          <div className="group text-center p-8 rounded-2xl bg-card/50 backdrop-blur border border-border hover-lift hover:border-primary/50 transition-all">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <ShoppingBag className="w-10 h-10 text-primary animate-float" style={{ animationDelay: '1s' }} />
-            </div>
-            <h3 className="text-2xl font-bold mb-3 text-foreground">Premium Items</h3>
-            <p className="text-muted-foreground leading-relaxed">Exclusive ranks and items carefully curated for your server</p>
-          </div>
         </div>
       </div>
 
@@ -308,7 +300,7 @@ const Index = () => {
       <div className="container mx-auto px-4 pb-16">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Featured Products
+            BuildMC Shop
           </h2>
           <Button asChild size="lg" className="gap-2">
             <Link to="/shop">
