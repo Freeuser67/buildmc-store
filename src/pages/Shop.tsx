@@ -52,9 +52,6 @@ const Shop = () => {
   const [heroTitle, setHeroTitle] = useState('BuildMC');
   const [heroSubtitle, setHeroSubtitle] = useState('Premium Ranks • Exclusive Kits • Epic Items');
   const [serverStatus, setServerStatus] = useState('Checking...');
-  const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [statusKey, setStatusKey] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [copied, setCopied] = useState(false);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
@@ -92,11 +89,6 @@ const Shop = () => {
       }
     }, 5000);
 
-    // Update current time every second for timestamp display
-    const timeInterval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
     const settingsChannel = supabase
       .channel('shop_site_settings_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, () => fetchSocialLinks())
@@ -104,7 +96,6 @@ const Shop = () => {
 
     return () => {
       clearInterval(statusInterval);
-      clearInterval(timeInterval);
       supabase.removeChannel(settingsChannel);
     };
   }, [serverIP]);
@@ -192,24 +183,10 @@ const Shop = () => {
       } else {
         setServerStatus('Server Offline');
       }
-      setLastUpdateTime(new Date());
-      setStatusKey(prev => prev + 1); // Trigger animation
     } catch (error) {
       console.error('Error fetching Minecraft status:', error);
       setServerStatus('Status Unknown');
-      setLastUpdateTime(new Date());
-      setStatusKey(prev => prev + 1); // Trigger animation
     }
-  };
-
-  const getTimeAgo = (date: Date) => {
-    const seconds = Math.floor((currentTime.getTime() - date.getTime()) / 1000);
-    if (seconds < 2) return 'Just now';
-    if (seconds < 60) return `${seconds}s ago`;
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    return `${hours}h ago`;
   };
 
   const filteredProducts = selectedCategory === 'all'
@@ -263,19 +240,9 @@ const Shop = () => {
           <div className="text-center space-y-8 px-4 max-w-5xl mx-auto animate-fade-in">
             {/* Server Status Badge */}
             <div className="inline-block mb-4">
-              <div 
-                key={statusKey}
-                className="glass-effect flex flex-col items-center gap-2 rounded-2xl px-6 py-3 neon-border animate-fade-in"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-primary rounded-full animate-pulse glow-effect" />
-                  <span className="text-primary font-bold text-base">{serverStatus}</span>
-                </div>
-                {lastUpdateTime && (
-                  <span className="text-muted-foreground text-xs font-medium">
-                    {getTimeAgo(lastUpdateTime)}
-                  </span>
-                )}
+              <div className="glass-effect flex items-center gap-3 rounded-full px-6 py-3 neon-border">
+                <div className="w-3 h-3 bg-primary rounded-full animate-pulse glow-effect" />
+                <span className="text-primary font-bold text-base">{serverStatus}</span>
               </div>
             </div>
 
