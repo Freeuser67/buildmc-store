@@ -211,7 +211,12 @@ const Index = () => {
                     <Shield className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Server IP</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground">Server IP</p>
+                      <Badge variant="secondary" className="text-xs px-2 py-0.5">
+                        🇧🇩 BD
+                      </Badge>
+                    </div>
                     <div className="flex items-center gap-2">
                       <p className="text-lg font-bold text-foreground">{siteSettings['server_ip']}</p>
                       <Button
