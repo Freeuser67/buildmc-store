@@ -87,7 +87,7 @@ const Shop = () => {
       fetchDiscordStats(discordServerId);
     }
 
-    // Poll server status every 5 seconds for real-time updates
+    // Poll server status every 2 seconds for real-time updates
     const statusInterval = setInterval(() => {
       if (serverIP) {
         fetchMinecraftStatus(serverIP);
@@ -95,7 +95,7 @@ const Shop = () => {
       if (discordServerId) {
         fetchDiscordStats(discordServerId);
       }
-    }, 5000);
+    }, 2000);
 
     const settingsChannel = supabase
       .channel('shop_site_settings_changes')
@@ -192,7 +192,7 @@ const Shop = () => {
       if (error) throw error;
 
       if (data.online) {
-        setServerStatus(`Server Online • ${data.players.online} Players`);
+        setServerStatus(`Server Online • ${data.players.online} Online Players`);
       } else {
         setServerStatus('Server Offline');
       }
@@ -279,7 +279,7 @@ const Shop = () => {
                 {discordServerId && (
                   <div className="glass-effect flex items-center gap-3 rounded-full px-6 py-3 neon-border hover:scale-105 transition-all">
                     <MessageCircle className="w-5 h-5 text-secondary animate-pulse" />
-                    <span className="text-secondary font-bold text-base">{discordMembers} Online</span>
+                    <span className="text-secondary font-bold text-base">{discordMembers} Online Members</span>
                   </div>
                 )}
               </div>
