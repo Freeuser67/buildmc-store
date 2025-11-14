@@ -49,6 +49,43 @@ const Index = () => {
     fetchCategories();
     fetchStatBoxes();
     fetchSiteSettings();
+
+    // Subscribe to realtime updates for site settings
+    const settingsChannel = supabase
+      .channel('site_settings_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'site_settings'
+        },
+        () => {
+          fetchSiteSettings();
+        }
+      )
+      .subscribe();
+
+    // Subscribe to realtime updates for stat boxes
+    const statBoxesChannel = supabase
+      .channel('stat_boxes_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'stat_boxes'
+        },
+        () => {
+          fetchStatBoxes();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(settingsChannel);
+      supabase.removeChannel(statBoxesChannel);
+    };
   }, []);
 
   const fetchProducts = async () => {
