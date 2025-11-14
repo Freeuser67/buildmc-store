@@ -10,8 +10,6 @@ import { Save } from "lucide-react";
 import { HeroSettingsSection } from "@/components/admin/HeroSettingsSection";
 import { ServerInfoSection } from "@/components/admin/ServerInfoSection";
 import { StorySection } from "@/components/admin/StorySection";
-import { CTASection } from "@/components/admin/CTASection";
-import { StatBoxesSection } from "@/components/admin/StatBoxesSection";
 import { QuickLinksSection } from "@/components/admin/QuickLinksSection";
 import { CommunityStatsSection } from "@/components/admin/CommunityStatsSection";
 
@@ -19,14 +17,6 @@ interface QuickLink {
   id: string;
   title: string;
   url: string;
-  display_order: number;
-}
-
-interface StatBox {
-  id: string;
-  icon: string;
-  label: string;
-  value: string;
   display_order: number;
 }
 
@@ -42,7 +32,6 @@ const SiteSettings = () => {
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const [quickLinks, setQuickLinks] = useState<QuickLink[]>([]);
-  const [statBoxes, setStatBoxes] = useState<StatBox[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Our Story fields
@@ -60,11 +49,6 @@ const SiteSettings = () => {
   const [heroTitle, setHeroTitle] = useState("");
   const [heroSubtitle, setHeroSubtitle] = useState("");
   const [heroButtonText, setHeroButtonText] = useState("");
-  
-  // CTA Section fields
-  const [ctaTitle, setCtaTitle] = useState("");
-  const [ctaSubtitle, setCtaSubtitle] = useState("");
-  const [ctaButtonText, setCtaButtonText] = useState("");
   
   // Additional fields for Shop page
   const [activePlayers, setActivePlayers] = useState("");
@@ -113,23 +97,11 @@ const SiteSettings = () => {
       setHeroTitle(settingsMap.hero_title || "");
       setHeroSubtitle(settingsMap.hero_subtitle || "");
       setHeroButtonText(settingsMap.hero_button_text || "");
-      setCtaTitle(settingsMap.cta_title || "");
-      setCtaSubtitle(settingsMap.cta_subtitle || "");
-      setCtaButtonText(settingsMap.cta_button_text || "");
 
       // Shop stats fields
       setActivePlayers(settingsMap.active_players || "");
       setEventsHosted(settingsMap.events_hosted || "");
       setUptime(settingsMap.uptime || "");
-
-      // Fetch stat boxes
-      const { data: statBoxesData, error: statBoxesError } = await supabase
-        .from("stat_boxes")
-        .select("*")
-        .order("display_order");
-
-      if (statBoxesError) throw statBoxesError;
-      setStatBoxes(statBoxesData || []);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -226,9 +198,6 @@ const SiteSettings = () => {
         { setting_key: "hero_title", setting_value: heroTitle },
         { setting_key: "hero_subtitle", setting_value: heroSubtitle },
         { setting_key: "hero_button_text", setting_value: heroButtonText },
-        { setting_key: "cta_title", setting_value: ctaTitle },
-        { setting_key: "cta_subtitle", setting_value: ctaSubtitle },
-        { setting_key: "cta_button_text", setting_value: ctaButtonText },
         // Shop metrics
         { setting_key: "active_players", setting_value: activePlayers },
         { setting_key: "events_hosted", setting_value: eventsHosted },
@@ -263,87 +232,6 @@ const SiteSettings = () => {
     }
   };
 
-  // Stat Box Management
-  const addStatBox = () => {
-    const newOrder = statBoxes.length > 0 ? Math.max(...statBoxes.map(s => s.display_order)) + 1 : 0;
-    setStatBoxes([...statBoxes, { 
-      id: crypto.randomUUID(), 
-      icon: "TrendingUp",
-      label: "", 
-      value: "", 
-      display_order: newOrder 
-    }]);
-  };
-
-  const updateStatBox = (id: string, field: keyof StatBox, value: string | number) => {
-    setStatBoxes(statBoxes.map(box => 
-      box.id === id ? { ...box, [field]: value } : box
-    ));
-  };
-
-  const deleteStatBox = async (id: string) => {
-    if (id.length === 36 && id.includes("-")) {
-      const { error } = await supabase
-        .from("stat_boxes")
-        .delete()
-        .eq("id", id);
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-    setStatBoxes(statBoxes.filter(box => box.id !== id));
-  };
-
-  const saveStatBoxes = async () => {
-    try {
-      console.log("Saving stat boxes:", statBoxes);
-      
-      // Delete all existing stat boxes and insert new ones
-      const { error: deleteError } = await supabase
-        .from("stat_boxes")
-        .delete()
-        .gte("id", "00000000-0000-0000-0000-000000000000");
-
-      if (deleteError) {
-        console.error("Delete error:", deleteError);
-        throw deleteError;
-      }
-
-      // Filter out empty stat boxes
-      const validBoxes = statBoxes.filter(box => box.label && box.value);
-      console.log("Valid boxes to insert:", validBoxes);
-
-      if (validBoxes.length > 0) {
-        const { data, error: insertError } = await supabase
-          .from("stat_boxes")
-          .insert(validBoxes.map(({ id, ...box }) => box))
-          .select();
-
-        console.log("Insert result:", data, insertError);
-        if (insertError) throw insertError;
-      }
-
-      toast({
-        title: "Success",
-        description: "Stat boxes saved successfully",
-      });
-      
-      await fetchData();
-    } catch (error: any) {
-      console.error("Save stat boxes error:", error);
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
 
   if (loading) {
     return (
@@ -402,15 +290,6 @@ const SiteSettings = () => {
           setStoryButtonUrl={setStoryButtonUrl}
         />
 
-        <CTASection
-          ctaTitle={ctaTitle}
-          setCtaTitle={setCtaTitle}
-          ctaSubtitle={ctaSubtitle}
-          setCtaSubtitle={setCtaSubtitle}
-          ctaButtonText={ctaButtonText}
-          setCtaButtonText={setCtaButtonText}
-        />
-
         {/* Save All Button */}
         <Card className="glass-effect mb-8 border-primary/20">
           <CardContent className="pt-6">
@@ -420,14 +299,6 @@ const SiteSettings = () => {
             </Button>
           </CardContent>
         </Card>
-
-        <StatBoxesSection
-          statBoxes={statBoxes}
-          onAdd={addStatBox}
-          onUpdate={updateStatBox}
-          onDelete={deleteStatBox}
-          onSave={saveStatBoxes}
-        />
 
         <QuickLinksSection
           quickLinks={quickLinks}
