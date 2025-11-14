@@ -192,7 +192,7 @@ const Shop = () => {
       if (error) throw error;
 
       if (data.online) {
-        setServerStatus(`${data.players.online} Online Players`);
+        setServerStatus(`In Game ${data.players.online} Online Players`);
       } else {
         setServerStatus('Server Offline');
       }
@@ -279,7 +279,7 @@ const Shop = () => {
                 {discordServerId && (
                   <div className="glass-effect flex items-center gap-3 rounded-full px-6 py-3 neon-border hover:scale-105 transition-all">
                     <MessageCircle className="w-5 h-5 text-secondary animate-pulse" />
-                    <span className="text-secondary font-bold text-base">{discordMembers} Online Members</span>
+                    <span className="text-secondary font-bold text-base">In Discord {discordMembers} Online Members</span>
                   </div>
                 )}
               </div>
