@@ -13,6 +13,7 @@ import { StorySection } from "@/components/admin/StorySection";
 import { CTASection } from "@/components/admin/CTASection";
 import { StatBoxesSection } from "@/components/admin/StatBoxesSection";
 import { QuickLinksSection } from "@/components/admin/QuickLinksSection";
+import { CommunityStatsSection } from "@/components/admin/CommunityStatsSection";
 
 interface QuickLink {
   id: string;
@@ -64,6 +65,11 @@ const SiteSettings = () => {
   const [ctaTitle, setCtaTitle] = useState("");
   const [ctaSubtitle, setCtaSubtitle] = useState("");
   const [ctaButtonText, setCtaButtonText] = useState("");
+  
+  // Additional fields for Shop page
+  const [activePlayers, setActivePlayers] = useState("");
+  const [eventsHosted, setEventsHosted] = useState("");
+  const [uptime, setUptime] = useState("");
 
   useEffect(() => {
     if (!user || !isAdmin) {
@@ -110,6 +116,11 @@ const SiteSettings = () => {
       setCtaTitle(settingsMap.cta_title || "");
       setCtaSubtitle(settingsMap.cta_subtitle || "");
       setCtaButtonText(settingsMap.cta_button_text || "");
+
+      // Shop stats fields
+      setActivePlayers(settingsMap.active_players || "");
+      setEventsHosted(settingsMap.events_hosted || "");
+      setUptime(settingsMap.uptime || "");
 
       // Fetch stat boxes
       const { data: statBoxesData, error: statBoxesError } = await supabase
@@ -218,6 +229,10 @@ const SiteSettings = () => {
         { setting_key: "cta_title", setting_value: ctaTitle },
         { setting_key: "cta_subtitle", setting_value: ctaSubtitle },
         { setting_key: "cta_button_text", setting_value: ctaButtonText },
+        // Shop metrics
+        { setting_key: "active_players", setting_value: activePlayers },
+        { setting_key: "events_hosted", setting_value: eventsHosted },
+        { setting_key: "uptime", setting_value: uptime },
       ];
 
       console.log("Settings to save:", settings);
@@ -365,6 +380,15 @@ const SiteSettings = () => {
           setServerIp={setServerIp}
           serverVersion={serverVersion}
           setServerVersion={setServerVersion}
+        />
+
+        <CommunityStatsSection
+          activePlayers={activePlayers}
+          setActivePlayers={setActivePlayers}
+          eventsHosted={eventsHosted}
+          setEventsHosted={setEventsHosted}
+          uptime={uptime}
+          setUptime={setUptime}
         />
 
         <StorySection

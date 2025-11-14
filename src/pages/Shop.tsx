@@ -79,11 +79,7 @@ const Shop = () => {
 
     const settingsChannel = supabase
       .channel('shop_site_settings_changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'site_settings' },
-        () => fetchSocialLinks()
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, () => fetchSocialLinks())
       .subscribe();
 
     return () => {
