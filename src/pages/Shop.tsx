@@ -84,12 +84,12 @@ const Shop = () => {
       fetchMinecraftStatus(serverIP);
     }
 
-    // Poll server status every 1 second for real-time updates
+    // Poll server status every 5 seconds for real-time updates
     const statusInterval = setInterval(() => {
       if (serverIP) {
         fetchMinecraftStatus(serverIP);
       }
-    }, 1000);
+    }, 5000);
 
     // Update current time every second for timestamp display
     const timeInterval = setInterval(() => {
