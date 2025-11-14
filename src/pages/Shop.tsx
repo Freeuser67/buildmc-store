@@ -46,6 +46,7 @@ const Shop = () => {
   const [quickLinks, setQuickLinks] = useState<QuickLink[]>([]);
   const [discordUrl, setDiscordUrl] = useState('https://discord.gg/buildmc');
   const [youtubeUrl, setYoutubeUrl] = useState('https://youtube.com/@buildmc');
+  const [discordMembers, setDiscordMembers] = useState('0');
   const [activePlayers, setActivePlayers] = useState('15K+');
   const [eventsHosted, setEventsHosted] = useState('500+');
   const [uptime, setUptime] = useState('24/7');
@@ -59,6 +60,7 @@ const Shop = () => {
   const navigate = useNavigate();
   
   const [serverIP, setServerIP] = useState('play.buildmc.net');
+  const [discordServerId, setDiscordServerId] = useState('');
   
   const handleCopyIP = async () => {
     try {
@@ -81,11 +83,17 @@ const Shop = () => {
     if (serverIP) {
       fetchMinecraftStatus(serverIP);
     }
+    if (discordServerId) {
+      fetchDiscordStats(discordServerId);
+    }
 
     // Poll server status every 5 seconds for real-time updates
     const statusInterval = setInterval(() => {
       if (serverIP) {
         fetchMinecraftStatus(serverIP);
+      }
+      if (discordServerId) {
+        fetchDiscordStats(discordServerId);
       }
     }, 5000);
 
@@ -152,6 +160,7 @@ const Shop = () => {
       const status = settings.find(s => s.setting_key === 'server_status');
       const ip = settings.find(s => s.setting_key === 'server_ip');
       const version = settings.find(s => s.setting_key === 'server_version');
+      const discordId = settings.find(s => s.setting_key === 'discord_server_id');
       
       if (discord) setDiscordUrl(discord.setting_value);
       if (youtube) setYoutubeUrl(youtube.setting_value);
@@ -165,6 +174,10 @@ const Shop = () => {
         setServerIP(ip.setting_value);
         // Fetch real-time server status
         fetchMinecraftStatus(ip.setting_value);
+      }
+      if (discordId) {
+        setDiscordServerId(discordId.setting_value);
+        fetchDiscordStats(discordId.setting_value);
       }
       // version is fetched for future use on this page if needed
     }
@@ -186,6 +199,21 @@ const Shop = () => {
     } catch (error) {
       console.error('Error fetching Minecraft status:', error);
       setServerStatus('Status Unknown');
+    }
+  };
+
+  const fetchDiscordStats = async (serverId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('discord-stats', {
+        body: { serverId }
+      });
+
+      if (error) throw error;
+
+      setDiscordMembers(data.memberCount.toString());
+    } catch (error) {
+      console.error('Error fetching Discord stats:', error);
+      setDiscordMembers('0');
     }
   };
 
@@ -240,9 +268,20 @@ const Shop = () => {
           <div className="text-center space-y-8 px-4 max-w-5xl mx-auto animate-fade-in">
             {/* Server Status Badge */}
             <div className="inline-block mb-4">
-              <div className="glass-effect flex items-center gap-3 rounded-full px-6 py-3 neon-border">
-                <div className="w-3 h-3 bg-primary rounded-full animate-pulse glow-effect" />
-                <span className="text-primary font-bold text-base">{serverStatus}</span>
+              <div className="flex gap-4 items-center">
+                {/* Minecraft Server Status */}
+                <div className="glass-effect flex items-center gap-3 rounded-full px-6 py-3 neon-border hover:scale-105 transition-all">
+                  <div className="w-3 h-3 bg-primary rounded-full animate-pulse glow-effect" />
+                  <span className="text-primary font-bold text-base">{serverStatus}</span>
+                </div>
+
+                {/* Discord Members */}
+                {discordServerId && (
+                  <div className="glass-effect flex items-center gap-3 rounded-full px-6 py-3 neon-border hover:scale-105 transition-all">
+                    <MessageCircle className="w-5 h-5 text-secondary animate-pulse" />
+                    <span className="text-secondary font-bold text-base">{discordMembers} Online</span>
+                  </div>
+                )}
               </div>
             </div>
 

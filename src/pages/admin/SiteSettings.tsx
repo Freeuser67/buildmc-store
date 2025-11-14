@@ -35,6 +35,7 @@ const SiteSettings = () => {
   // Server Info fields
   const [serverIp, setServerIp] = useState("");
   const [serverVersion, setServerVersion] = useState("");
+  const [discordServerId, setDiscordServerId] = useState("");
   
   // Additional fields for Shop page
   const [activePlayers, setActivePlayers] = useState("");
@@ -75,6 +76,7 @@ const SiteSettings = () => {
       
       setServerIp(settingsMap.server_ip || "");
       setServerVersion(settingsMap.server_version || "");
+      setDiscordServerId(settingsMap.discord_server_id || "");
 
       // Shop stats fields
       setActivePlayers(settingsMap.active_players || "");
@@ -168,6 +170,7 @@ const SiteSettings = () => {
       const settings = [
         { setting_key: "server_ip", setting_value: serverIp },
         { setting_key: "server_version", setting_value: serverVersion },
+        { setting_key: "discord_server_id", setting_value: discordServerId },
         // Shop metrics
         { setting_key: "active_players", setting_value: activePlayers },
         { setting_key: "events_hosted", setting_value: eventsHosted },
@@ -227,6 +230,8 @@ const SiteSettings = () => {
           setServerIp={setServerIp}
           serverVersion={serverVersion}
           setServerVersion={setServerVersion}
+          discordServerId={discordServerId}
+          setDiscordServerId={setDiscordServerId}
         />
 
         <CommunityStatsSection
