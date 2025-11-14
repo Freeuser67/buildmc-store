@@ -79,6 +79,11 @@ const Shop = () => {
     fetchQuickLinks();
     fetchSocialLinks();
 
+    // Fetch initial status immediately
+    if (serverIP) {
+      fetchMinecraftStatus(serverIP);
+    }
+
     // Poll server status every 1 second for real-time updates
     const statusInterval = setInterval(() => {
       if (serverIP) {
