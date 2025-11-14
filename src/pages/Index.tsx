@@ -420,28 +420,6 @@ const Index = () => {
         )}
       </div>
 
-      {/* Story Section */}
-      {siteSettings['story_title'] && (
-        <div className="container mx-auto px-4 pb-16">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              {siteSettings['story_title']}
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed whitespace-pre-line">
-              {siteSettings['story_text']}
-            </p>
-            {siteSettings['story_button_text'] && (
-              <Button asChild size="lg" className="gap-2">
-                <Link to={siteSettings['story_button_url'] || '/shop'}>
-                  {siteSettings['story_button_text']}
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </Button>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* CTA Section */}
       <div className="container mx-auto px-4 pb-24">
         <div className="relative overflow-hidden rounded-3xl p-12 md:p-16 text-center" style={{ background: 'var(--gradient-card)' }}>

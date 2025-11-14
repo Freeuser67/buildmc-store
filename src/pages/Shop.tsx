@@ -371,53 +371,6 @@ const Shop = () => {
         </Tabs>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="relative py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
-        <div className="container mx-auto px-4 relative">
-          <div className="max-w-4xl mx-auto text-center mb-16 animate-fade-in">
-            <Badge className="mb-4 text-base px-6 py-2 neon-border">Our Story</Badge>
-            <h2 className="text-5xl md:text-7xl font-black mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Welcome to BuildMC
-            </h2>
-            <p className="text-xl text-muted-foreground leading-relaxed">
-              BuildMC is more than just a Minecraft server—it's a thriving community of builders, 
-              warriors, and adventurers. Founded in 2023, we've grown into one of the most popular 
-              servers with thousands of active players creating legendary moments every day.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <Card className="glass-effect p-8 text-center hover-lift rounded-3xl neon-border group">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-primary/20 flex items-center justify-center glow-effect group-hover:scale-110 transition-all">
-                <Users className="w-10 h-10 text-primary" />
-              </div>
-              <h3 className="text-3xl font-black text-primary mb-2">{activePlayers}</h3>
-              <p className="text-lg font-semibold text-foreground mb-1">Active Players</p>
-              <p className="text-sm text-muted-foreground">Join our amazing community</p>
-            </Card>
-
-            <Card className="glass-effect p-8 text-center hover-lift rounded-3xl neon-border group">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-secondary/20 flex items-center justify-center glow-secondary group-hover:scale-110 transition-all">
-                <Trophy className="w-10 h-10 text-secondary" />
-              </div>
-              <h3 className="text-3xl font-black text-secondary mb-2">{eventsHosted}</h3>
-              <p className="text-lg font-semibold text-foreground mb-1">Events Hosted</p>
-              <p className="text-sm text-muted-foreground">Epic competitions & prizes</p>
-            </Card>
-
-            <Card className="glass-effect p-8 text-center hover-lift rounded-3xl neon-border group">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-accent/20 flex items-center justify-center glow-effect group-hover:scale-110 transition-all">
-                <Sparkles className="w-10 h-10 text-accent" />
-              </div>
-              <h3 className="text-3xl font-black text-accent mb-2">{uptime}</h3>
-              <p className="text-lg font-semibold text-foreground mb-1">Uptime</p>
-              <p className="text-sm text-muted-foreground">Always online, always fun</p>
-            </Card>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="relative border-t border-border/50 py-16 bg-gradient-to-b from-background to-card/30">
         <div className="container mx-auto px-4">
