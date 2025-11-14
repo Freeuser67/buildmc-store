@@ -270,13 +270,9 @@ const Shop = () => {
       {/* Products Section */}
       <section id="products" className="container mx-auto px-4 py-24">
         <div className="mb-16 text-center animate-slide-up">
-          <Badge className="mb-4 text-base px-6 py-2 neon-border">Premium Items</Badge>
           <h2 className="text-5xl md:text-7xl font-black mb-6 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
-            Shop Products
+            BuildMC Shop
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Discover exclusive ranks, powerful kits, and rare items to dominate the server
-          </p>
         </div>
 
         <Tabs defaultValue="all" onValueChange={setSelectedCategory} className="w-full">
