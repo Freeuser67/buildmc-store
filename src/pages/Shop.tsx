@@ -51,7 +51,7 @@ const Shop = () => {
   const [uptime, setUptime] = useState('24/7');
   const [heroTitle, setHeroTitle] = useState('BuildMC');
   const [heroSubtitle, setHeroSubtitle] = useState('Premium Ranks • Exclusive Kits • Epic Items');
-  const [serverStatus, setServerStatus] = useState('Server Online • 247 Players');
+  const [serverStatus, setServerStatus] = useState('Checking...');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [copied, setCopied] = useState(false);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
@@ -77,15 +77,23 @@ const Shop = () => {
     fetchQuickLinks();
     fetchSocialLinks();
 
+    // Poll server status every 30 seconds
+    const statusInterval = setInterval(() => {
+      if (serverIP) {
+        fetchMinecraftStatus(serverIP);
+      }
+    }, 30000);
+
     const settingsChannel = supabase
       .channel('shop_site_settings_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, () => fetchSocialLinks())
       .subscribe();
 
     return () => {
+      clearInterval(statusInterval);
       supabase.removeChannel(settingsChannel);
     };
-  }, []);
+  }, [serverIP]);
 
   const fetchCategories = async () => {
     const { data, error } = await supabase
@@ -148,8 +156,31 @@ const Shop = () => {
       if (title) setHeroTitle(title.setting_value);
       if (subtitle) setHeroSubtitle(subtitle.setting_value);
       if (status) setServerStatus(status.setting_value);
-      if (ip) setServerIP(ip.setting_value);
+      if (ip) {
+        setServerIP(ip.setting_value);
+        // Fetch real-time server status
+        fetchMinecraftStatus(ip.setting_value);
+      }
       // version is fetched for future use on this page if needed
+    }
+  };
+
+  const fetchMinecraftStatus = async (ip: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('minecraft-status', {
+        body: { serverIP: ip }
+      });
+
+      if (error) throw error;
+
+      if (data.online) {
+        setServerStatus(`Server Online • ${data.players.online} Players`);
+      } else {
+        setServerStatus('Server Offline');
+      }
+    } catch (error) {
+      console.error('Error fetching Minecraft status:', error);
+      setServerStatus('Status Unknown');
     }
   };
 
