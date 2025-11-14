@@ -58,7 +58,7 @@ const Shop = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   
-  const serverIP = 'play.build-mc.fun';
+  const [serverIP, setServerIP] = useState('play.buildmc.net');
   
   const handleCopyIP = async () => {
     try {
@@ -76,6 +76,19 @@ const Shop = () => {
     fetchProducts();
     fetchQuickLinks();
     fetchSocialLinks();
+
+    const settingsChannel = supabase
+      .channel('shop_site_settings_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'site_settings' },
+        () => fetchSocialLinks()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(settingsChannel);
+    };
   }, []);
 
   const fetchCategories = async () => {
@@ -128,6 +141,8 @@ const Shop = () => {
       const title = settings.find(s => s.setting_key === 'hero_title');
       const subtitle = settings.find(s => s.setting_key === 'hero_subtitle');
       const status = settings.find(s => s.setting_key === 'server_status');
+      const ip = settings.find(s => s.setting_key === 'server_ip');
+      const version = settings.find(s => s.setting_key === 'server_version');
       
       if (discord) setDiscordUrl(discord.setting_value);
       if (youtube) setYoutubeUrl(youtube.setting_value);
@@ -137,6 +152,8 @@ const Shop = () => {
       if (title) setHeroTitle(title.setting_value);
       if (subtitle) setHeroSubtitle(subtitle.setting_value);
       if (status) setServerStatus(status.setting_value);
+      if (ip) setServerIP(ip.setting_value);
+      // version is fetched for future use on this page if needed
     }
   };
 
