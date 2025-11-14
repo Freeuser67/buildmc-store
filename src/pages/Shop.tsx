@@ -267,7 +267,7 @@ const Shop = () => {
                 </div>
                 {lastUpdateTime && (
                   <span className="text-muted-foreground text-xs font-medium">
-                    Last updated: {getTimeAgo(lastUpdateTime)}
+                    {getTimeAgo(lastUpdateTime)}
                   </span>
                 )}
               </div>
