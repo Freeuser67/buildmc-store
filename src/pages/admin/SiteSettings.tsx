@@ -8,7 +8,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Save } from "lucide-react";
 import { ServerInfoSection } from "@/components/admin/ServerInfoSection";
-import { StorySection } from "@/components/admin/StorySection";
 import { QuickLinksSection } from "@/components/admin/QuickLinksSection";
 import { CommunityStatsSection } from "@/components/admin/CommunityStatsSection";
 
@@ -32,12 +31,6 @@ const SiteSettings = () => {
   const { toast } = useToast();
   const [quickLinks, setQuickLinks] = useState<QuickLink[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // Our Story fields
-  const [storyTitle, setStoryTitle] = useState("");
-  const [storyText, setStoryText] = useState("");
-  const [storyButtonText, setStoryButtonText] = useState("");
-  const [storyButtonUrl, setStoryButtonUrl] = useState("");
   
   // Server Info fields
   const [serverIp, setServerIp] = useState("");
@@ -80,10 +73,6 @@ const SiteSettings = () => {
         return acc;
       }, {} as Record<string, string>) || {};
       
-      setStoryTitle(settingsMap.story_title || "");
-      setStoryText(settingsMap.story_text || "");
-      setStoryButtonText(settingsMap.story_button_text || "");
-      setStoryButtonUrl(settingsMap.story_button_url || "");
       setServerIp(settingsMap.server_ip || "");
       setServerVersion(settingsMap.server_version || "");
 
@@ -177,10 +166,6 @@ const SiteSettings = () => {
     try {
       console.log("Saving all settings...");
       const settings = [
-        { setting_key: "story_title", setting_value: storyTitle },
-        { setting_key: "story_text", setting_value: storyText },
-        { setting_key: "story_button_text", setting_value: storyButtonText },
-        { setting_key: "story_button_url", setting_value: storyButtonUrl },
         { setting_key: "server_ip", setting_value: serverIp },
         { setting_key: "server_version", setting_value: serverVersion },
         // Shop metrics
@@ -251,17 +236,6 @@ const SiteSettings = () => {
           setEventsHosted={setEventsHosted}
           uptime={uptime}
           setUptime={setUptime}
-        />
-
-        <StorySection
-          storyTitle={storyTitle}
-          setStoryTitle={setStoryTitle}
-          storyText={storyText}
-          setStoryText={setStoryText}
-          storyButtonText={storyButtonText}
-          setStoryButtonText={setStoryButtonText}
-          storyButtonUrl={storyButtonUrl}
-          setStoryButtonUrl={setStoryButtonUrl}
         />
 
         {/* Save All Button */}
