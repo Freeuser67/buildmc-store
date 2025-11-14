@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Save } from "lucide-react";
-import { HeroSettingsSection } from "@/components/admin/HeroSettingsSection";
 import { ServerInfoSection } from "@/components/admin/ServerInfoSection";
 import { StorySection } from "@/components/admin/StorySection";
 import { QuickLinksSection } from "@/components/admin/QuickLinksSection";
@@ -43,12 +42,6 @@ const SiteSettings = () => {
   // Server Info fields
   const [serverIp, setServerIp] = useState("");
   const [serverVersion, setServerVersion] = useState("");
-  
-  // Hero Section fields
-  const [heroGreeting, setHeroGreeting] = useState("");
-  const [heroTitle, setHeroTitle] = useState("");
-  const [heroSubtitle, setHeroSubtitle] = useState("");
-  const [heroButtonText, setHeroButtonText] = useState("");
   
   // Additional fields for Shop page
   const [activePlayers, setActivePlayers] = useState("");
@@ -93,10 +86,6 @@ const SiteSettings = () => {
       setStoryButtonUrl(settingsMap.story_button_url || "");
       setServerIp(settingsMap.server_ip || "");
       setServerVersion(settingsMap.server_version || "");
-      setHeroGreeting(settingsMap.hero_greeting || "");
-      setHeroTitle(settingsMap.hero_title || "");
-      setHeroSubtitle(settingsMap.hero_subtitle || "");
-      setHeroButtonText(settingsMap.hero_button_text || "");
 
       // Shop stats fields
       setActivePlayers(settingsMap.active_players || "");
@@ -194,10 +183,6 @@ const SiteSettings = () => {
         { setting_key: "story_button_url", setting_value: storyButtonUrl },
         { setting_key: "server_ip", setting_value: serverIp },
         { setting_key: "server_version", setting_value: serverVersion },
-        { setting_key: "hero_greeting", setting_value: heroGreeting },
-        { setting_key: "hero_title", setting_value: heroTitle },
-        { setting_key: "hero_subtitle", setting_value: heroSubtitle },
-        { setting_key: "hero_button_text", setting_value: heroButtonText },
         // Shop metrics
         { setting_key: "active_players", setting_value: activePlayers },
         { setting_key: "events_hosted", setting_value: eventsHosted },
@@ -251,17 +236,6 @@ const SiteSettings = () => {
         <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
           Site Settings
         </h1>
-
-        <HeroSettingsSection
-          heroGreeting={heroGreeting}
-          setHeroGreeting={setHeroGreeting}
-          heroTitle={heroTitle}
-          setHeroTitle={setHeroTitle}
-          heroSubtitle={heroSubtitle}
-          setHeroSubtitle={setHeroSubtitle}
-          heroButtonText={heroButtonText}
-          setHeroButtonText={setHeroButtonText}
-        />
 
         <ServerInfoSection
           serverIp={serverIp}
