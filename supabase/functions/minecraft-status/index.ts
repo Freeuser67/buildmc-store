@@ -19,30 +19,43 @@ serve(async (req) => {
 
     console.log('Fetching status for server:', serverIP);
 
-    // Use mcstatus.io API to get Minecraft server status
-    const response = await fetch(`https://api.mcstatus.io/v2/status/java/${serverIP}`);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch server status: ${response.statusText}`);
+    // Retry logic with exponential backoff
+    let lastError;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const response = await fetch(`https://api.mcstatus.io/v2/status/java/${serverIP}`, {
+          signal: AbortSignal.timeout(10000), // 10 second timeout
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch server status: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log('Server status:', data);
+
+        const result = {
+          online: data.online || false,
+          players: {
+            online: data.players?.online || 0,
+            max: data.players?.max || 0,
+          },
+          version: data.version?.name_clean || 'Unknown',
+          motd: data.motd?.clean || '',
+        };
+
+        return new Response(JSON.stringify(result), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (error) {
+        lastError = error;
+        if (attempt < 2) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+        }
+      }
     }
-
-    const data = await response.json();
     
-    console.log('Server status:', data);
-
-    const result = {
-      online: data.online || false,
-      players: {
-        online: data.players?.online || 0,
-        max: data.players?.max || 0,
-      },
-      version: data.version?.name_clean || 'Unknown',
-      motd: data.motd?.clean || '',
-    };
-
-    return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    throw lastError;
   } catch (error: any) {
     console.error('Error fetching Minecraft server status:', error);
     return new Response(

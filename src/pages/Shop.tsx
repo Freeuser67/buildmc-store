@@ -77,12 +77,12 @@ const Shop = () => {
     fetchQuickLinks();
     fetchSocialLinks();
 
-    // Poll server status every 0.1 seconds for real-time updates
+    // Poll server status every 60 seconds to avoid rate limiting
     const statusInterval = setInterval(() => {
       if (serverIP) {
         fetchMinecraftStatus(serverIP);
       }
-    }, 100);
+    }, 60000);
 
     const settingsChannel = supabase
       .channel('shop_site_settings_changes')
