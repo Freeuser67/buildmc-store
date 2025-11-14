@@ -53,6 +53,7 @@ const Shop = () => {
   const [heroSubtitle, setHeroSubtitle] = useState('Premium Ranks • Exclusive Kits • Epic Items');
   const [serverStatus, setServerStatus] = useState('Checking...');
   const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
+  const [, setCurrentTime] = useState(new Date());
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [copied, setCopied] = useState(false);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
@@ -85,6 +86,11 @@ const Shop = () => {
       }
     }, 1000);
 
+    // Update current time every second for timestamp display
+    const timeInterval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
     const settingsChannel = supabase
       .channel('shop_site_settings_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, () => fetchSocialLinks())
@@ -92,6 +98,7 @@ const Shop = () => {
 
     return () => {
       clearInterval(statusInterval);
+      clearInterval(timeInterval);
       supabase.removeChannel(settingsChannel);
     };
   }, [serverIP]);
@@ -187,6 +194,16 @@ const Shop = () => {
     }
   };
 
+  const getTimeAgo = (date: Date) => {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    if (seconds < 5) return 'Just now';
+    if (seconds < 60) return `${seconds}s ago`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    return `${hours}h ago`;
+  };
+
   const filteredProducts = selectedCategory === 'all'
     ? products
     : products.filter(p => p.category_id === selectedCategory);
@@ -245,7 +262,7 @@ const Shop = () => {
                 </div>
                 {lastUpdateTime && (
                   <span className="text-muted-foreground text-xs font-medium">
-                    Last updated: {lastUpdateTime.toLocaleTimeString()}
+                    Last updated: {getTimeAgo(lastUpdateTime)}
                   </span>
                 )}
               </div>
