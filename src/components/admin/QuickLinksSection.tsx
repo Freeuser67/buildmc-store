@@ -29,7 +29,9 @@ export const QuickLinksSection = ({
     <Card className="glass-effect border-primary/20">
       <CardHeader>
         <CardTitle>Quick Links</CardTitle>
-        <CardDescription>Manage footer quick links</CardDescription>
+        <CardDescription>
+          Manage footer quick links. Add important links like Discord, Wiki, Rules, or Social Media pages. These will appear in the footer of your site.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {quickLinks.map((link) => (
