@@ -192,7 +192,7 @@ const Shop = () => {
       if (error) throw error;
 
       if (data.online) {
-        setServerStatus(`Server Online • ${data.players.online} Online Players`);
+        setServerStatus(`${data.players.online} Online Players`);
       } else {
         setServerStatus('Server Offline');
       }
