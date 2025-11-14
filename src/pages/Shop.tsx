@@ -52,6 +52,7 @@ const Shop = () => {
   const [heroTitle, setHeroTitle] = useState('BuildMC');
   const [heroSubtitle, setHeroSubtitle] = useState('Premium Ranks • Exclusive Kits • Epic Items');
   const [serverStatus, setServerStatus] = useState('Checking...');
+  const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [copied, setCopied] = useState(false);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
@@ -178,9 +179,11 @@ const Shop = () => {
       } else {
         setServerStatus('Server Offline');
       }
+      setLastUpdateTime(new Date());
     } catch (error) {
       console.error('Error fetching Minecraft status:', error);
       setServerStatus('Status Unknown');
+      setLastUpdateTime(new Date());
     }
   };
 
@@ -235,9 +238,16 @@ const Shop = () => {
           <div className="text-center space-y-8 px-4 max-w-5xl mx-auto animate-fade-in">
             {/* Server Status Badge */}
             <div className="inline-block mb-4">
-              <div className="glass-effect flex items-center gap-3 rounded-full px-6 py-3 neon-border">
-                <div className="w-3 h-3 bg-primary rounded-full animate-pulse glow-effect" />
-                <span className="text-primary font-bold text-base">{serverStatus}</span>
+              <div className="glass-effect flex flex-col items-center gap-2 rounded-2xl px-6 py-3 neon-border">
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 bg-primary rounded-full animate-pulse glow-effect" />
+                  <span className="text-primary font-bold text-base">{serverStatus}</span>
+                </div>
+                {lastUpdateTime && (
+                  <span className="text-muted-foreground text-xs font-medium">
+                    Last updated: {lastUpdateTime.toLocaleTimeString()}
+                  </span>
+                )}
               </div>
             </div>
 
