@@ -429,7 +429,7 @@ const Shop = () => {
                   BuildMC
                 </h3>
                 <p className="text-muted-foreground mb-6 leading-relaxed">
-                  The ultimate Minecraft server experience with custom game modes, exclusive items, and an amazing community.
+                  BuildMC is a top-rated Bangladeshi Minecraft server, known for its survival gameplay, daily events, and low ping for players in Bangladesh
                 </p>
                 <div className="flex gap-4 justify-center md:justify-start">
                   <Button 
