@@ -9,12 +9,14 @@ interface QuickLink {
   url: string;
   quick_text?: string;
   display_order: number;
+  is_text_only?: boolean;
 }
 
 interface QuickLinksSectionProps {
   quickLinks: QuickLink[];
   onAdd: () => void;
-  onUpdate: (id: string, field: keyof QuickLink, value: string | number) => void;
+  onAddText: () => void;
+  onUpdate: (id: string, field: keyof QuickLink, value: string | number | boolean) => void;
   onDelete: (id: string) => void;
   onSave: () => void;
 }
@@ -22,6 +24,7 @@ interface QuickLinksSectionProps {
 export const QuickLinksSection = ({
   quickLinks,
   onAdd,
+  onAddText,
   onUpdate,
   onDelete,
   onSave,
@@ -39,17 +42,19 @@ export const QuickLinksSection = ({
           <div key={link.id} className="flex gap-2 items-start p-4 bg-card/50 rounded-lg border border-border/50">
             <div className="flex-1 space-y-2">
               <Input
-                placeholder="Link Title"
+                placeholder={link.is_text_only ? "Text Title" : "Link Title"}
                 value={link.title}
                 onChange={(e) => onUpdate(link.id, "title", e.target.value)}
               />
+              {!link.is_text_only && (
+                <Input
+                  placeholder="https://..."
+                  value={link.url}
+                  onChange={(e) => onUpdate(link.id, "url", e.target.value)}
+                />
+              )}
               <Input
-                placeholder="https://..."
-                value={link.url}
-                onChange={(e) => onUpdate(link.id, "url", e.target.value)}
-              />
-              <Input
-                placeholder="Quick text (optional description)"
+                placeholder={link.is_text_only ? "Text content" : "Quick text (optional description)"}
                 value={link.quick_text || ""}
                 onChange={(e) => onUpdate(link.id, "quick_text", e.target.value)}
               />
@@ -63,14 +68,18 @@ export const QuickLinksSection = ({
             </Button>
           </div>
         ))}
-        <div className="flex gap-2">
-          <Button onClick={onAdd} variant="outline" className="flex-1">
+        <div className="grid grid-cols-3 gap-2">
+          <Button onClick={onAdd} variant="outline">
             <Plus className="w-4 h-4 mr-2" />
             Add Link
           </Button>
-          <Button onClick={onSave} className="flex-1">
+          <Button onClick={onAddText} variant="outline">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Text
+          </Button>
+          <Button onClick={onSave}>
             <Save className="w-4 h-4 mr-2" />
-            Save Quick Links
+            Save
           </Button>
         </div>
       </CardContent>
