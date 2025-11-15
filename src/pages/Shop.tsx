@@ -34,6 +34,7 @@ interface QuickLink {
   url: string;
   quick_text?: string;
   display_order: number;
+  is_text_only?: boolean;
 }
 
 interface SiteSetting {
@@ -468,15 +469,26 @@ const Shop = () => {
                   <ul className="space-y-4">
                     {quickLinks.map((link) => (
                       <li key={link.id} className="space-y-1">
-                        <Button 
-                          variant="link" 
-                          className="text-muted-foreground hover:text-primary text-base font-medium hover:scale-110 transition-all p-0"
-                          onClick={() => window.open(link.url, '_blank')}
-                        >
-                          {link.title}
-                        </Button>
-                        {link.quick_text && (
-                          <p className="text-xs text-muted-foreground/70 px-2">{link.quick_text}</p>
+                        {link.is_text_only ? (
+                          <div className="text-center">
+                            <p className="text-base font-medium text-foreground">{link.title}</p>
+                            {link.quick_text && (
+                              <p className="text-xs text-muted-foreground/70 px-2">{link.quick_text}</p>
+                            )}
+                          </div>
+                        ) : (
+                          <>
+                            <Button 
+                              variant="link" 
+                              className="text-muted-foreground hover:text-primary text-base font-medium hover:scale-110 transition-all p-0"
+                              onClick={() => window.open(link.url, '_blank')}
+                            >
+                              {link.title}
+                            </Button>
+                            {link.quick_text && (
+                              <p className="text-xs text-muted-foreground/70 px-2">{link.quick_text}</p>
+                            )}
+                          </>
                         )}
                       </li>
                     ))}

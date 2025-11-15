@@ -15,7 +15,9 @@ interface QuickLink {
   id: string;
   title: string;
   url: string;
+  quick_text?: string;
   display_order: number;
+  is_text_only?: boolean;
 }
 
 interface SiteSetting {
@@ -103,7 +105,19 @@ const SiteSettings = () => {
     }]);
   };
 
-  const updateQuickLink = (id: string, field: keyof QuickLink, value: string | number) => {
+  const addTextOnlyLink = () => {
+    const newOrder = quickLinks.length > 0 ? Math.max(...quickLinks.map(l => l.display_order)) + 1 : 0;
+    setQuickLinks([...quickLinks, { 
+      id: crypto.randomUUID(), 
+      title: "", 
+      url: "", 
+      quick_text: "",
+      display_order: newOrder,
+      is_text_only: true
+    }]);
+  };
+
+  const updateQuickLink = (id: string, field: keyof QuickLink, value: string | number | boolean) => {
     setQuickLinks(quickLinks.map(link => 
       link.id === id ? { ...link, [field]: value } : link
     ));
@@ -256,6 +270,7 @@ const SiteSettings = () => {
         <QuickLinksSection
           quickLinks={quickLinks}
           onAdd={addQuickLink}
+          onAddText={addTextOnlyLink}
           onUpdate={updateQuickLink}
           onDelete={deleteQuickLink}
           onSave={saveQuickLinks}
