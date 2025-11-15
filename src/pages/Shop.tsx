@@ -315,26 +315,6 @@ const Shop = () => {
               </div>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-4 justify-center pt-8">
-              <Button 
-                size="lg" 
-                className="text-lg px-10 py-7 rounded-2xl font-bold glow-effect hover:scale-110 transition-all neon-border"
-                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                <ShoppingCart className="w-6 h-6 mr-2" />
-                Browse Store
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="text-lg px-10 py-7 rounded-2xl font-bold glass-effect hover:scale-110 transition-all border-2 border-primary/30"
-                onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                <Sparkles className="w-6 h-6 mr-2" />
-                Learn More
-              </Button>
-            </div>
           </div>
         </div>
 
