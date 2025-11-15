@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
-import { ShoppingCart, User, LogOut, Shield } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Shield, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/hooks/useTheme';
 
 export const Navbar = () => {
   const { user, isAdmin, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   return (
     <nav className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-50 shadow-lg">
@@ -19,6 +21,26 @@ export const Navbar = () => {
         </Link>
 
         <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-1">
+            <Button
+              variant={theme === "minecraft" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setTheme("minecraft")}
+              className="text-xs"
+            >
+              Normal
+            </Button>
+            <Button
+              variant={theme === "light" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setTheme("light")}
+              className="text-xs"
+            >
+              <Sun className="w-3 h-3 mr-1" />
+              Light
+            </Button>
+          </div>
+          
           {user ? (
             <>
               {isAdmin && (
