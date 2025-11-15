@@ -152,8 +152,10 @@ const SiteSettings = () => {
 
       if (deleteError) throw deleteError;
 
-      // Filter out empty links
-      const validLinks = quickLinks.filter(link => link.title && link.url);
+      // Filter out empty entries - keep links with URLs or text-only entries
+      const validLinks = quickLinks.filter(link => 
+        link.title && (link.url || link.is_text_only)
+      );
 
       if (validLinks.length > 0) {
         const { error: insertError } = await supabase
