@@ -32,6 +32,7 @@ interface QuickLink {
   id: string;
   title: string;
   url: string;
+  quick_text?: string;
   display_order: number;
 }
 
@@ -464,16 +465,19 @@ const Shop = () => {
               <div className="text-center">
                 <h4 className="text-xl font-bold text-foreground mb-6">Quick Links</h4>
                 {quickLinks.length > 0 ? (
-                  <ul className="space-y-3">
+                  <ul className="space-y-4">
                     {quickLinks.map((link) => (
-                      <li key={link.id}>
+                      <li key={link.id} className="space-y-1">
                         <Button 
                           variant="link" 
-                          className="text-muted-foreground hover:text-primary text-base font-medium hover:scale-110 transition-all"
+                          className="text-muted-foreground hover:text-primary text-base font-medium hover:scale-110 transition-all p-0"
                           onClick={() => window.open(link.url, '_blank')}
                         >
                           {link.title}
                         </Button>
+                        {link.quick_text && (
+                          <p className="text-xs text-muted-foreground/70 px-2">{link.quick_text}</p>
+                        )}
                       </li>
                     ))}
                   </ul>
