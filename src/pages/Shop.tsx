@@ -520,7 +520,7 @@ const Shop = () => {
                 © 2025 BuildMC. All rights reserved. Not affiliated with Mojang or Microsoft.
               </p>
               <p className="text-muted-foreground/60 text-xs mt-2">
-                Made with ❤️ for the Minecraft community
+                Made with ❤️ buildmc studio
               </p>
             </div>
           </div>
