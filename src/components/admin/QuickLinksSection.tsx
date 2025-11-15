@@ -7,6 +7,7 @@ interface QuickLink {
   id: string;
   title: string;
   url: string;
+  quick_text?: string;
   display_order: number;
 }
 
@@ -46,6 +47,11 @@ export const QuickLinksSection = ({
                 placeholder="https://..."
                 value={link.url}
                 onChange={(e) => onUpdate(link.id, "url", e.target.value)}
+              />
+              <Input
+                placeholder="Quick text (optional description)"
+                value={link.quick_text || ""}
+                onChange={(e) => onUpdate(link.id, "quick_text", e.target.value)}
               />
             </div>
             <Button

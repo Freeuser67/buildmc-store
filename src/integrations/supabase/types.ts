@@ -155,6 +155,7 @@ export type Database = {
           created_at: string
           display_order: number
           id: string
+          quick_text: string | null
           title: string
           updated_at: string
           url: string
@@ -163,6 +164,7 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          quick_text?: string | null
           title: string
           updated_at?: string
           url: string
@@ -171,6 +173,7 @@ export type Database = {
           created_at?: string
           display_order?: number
           id?: string
+          quick_text?: string | null
           title?: string
           updated_at?: string
           url?: string
