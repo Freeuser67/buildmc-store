@@ -468,12 +468,12 @@ const Shop = () => {
                 {quickLinks.length > 0 ? (
                   <ul className="space-y-4">
                     {quickLinks.map((link) => (
-                      <li key={link.id} className="space-y-1">
+                      <li key={link.id} className="space-y-2">
                         {link.is_text_only ? (
-                          <div className="text-center">
-                            <p className="text-base font-medium text-foreground">{link.title}</p>
+                          <div className="text-center px-4">
+                            <p className="text-lg font-semibold text-foreground mb-1">{link.title}</p>
                             {link.quick_text && (
-                              <p className="text-xs text-muted-foreground/70 px-2">{link.quick_text}</p>
+                              <p className="text-sm text-muted-foreground leading-relaxed">{link.quick_text}</p>
                             )}
                           </div>
                         ) : (
