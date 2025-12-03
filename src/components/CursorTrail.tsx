@@ -7,10 +7,21 @@ interface Point {
   age: number;
 }
 
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  age: number;
+  color: string;
+  size: number;
+}
+
 export const CursorTrail = () => {
   const { theme } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointsRef = useRef<Point[]>([]);
+  const particlesRef = useRef<Particle[]>([]);
   const mouseRef = useRef({ x: 0, y: 0 });
   const animationRef = useRef<number>();
 
@@ -41,9 +52,28 @@ export const CursorTrail = () => {
     };
     window.addEventListener('mousemove', handleMouseMove);
 
+    const handleClick = (e: MouseEvent) => {
+      const particleCount = 20;
+      for (let i = 0; i < particleCount; i++) {
+        const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.5;
+        const speed = 3 + Math.random() * 5;
+        particlesRef.current.push({
+          x: e.clientX,
+          y: e.clientY,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          age: 0,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: 4 + Math.random() * 6
+        });
+      }
+    };
+    window.addEventListener('click', handleClick);
+
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // Draw cursor trail
       pointsRef.current = pointsRef.current.filter(p => p.age < 1);
       pointsRef.current.forEach(p => p.age += 0.02);
 
@@ -67,6 +97,27 @@ export const CursorTrail = () => {
         }
       }
 
+      // Draw click particles
+      particlesRef.current = particlesRef.current.filter(p => p.age < 1);
+      particlesRef.current.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.15; // gravity
+        p.vx *= 0.98; // friction
+        p.age += 0.025;
+
+        const alpha = 1 - p.age;
+        const size = p.size * (1 - p.age * 0.5);
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = alpha;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = p.color;
+        ctx.fill();
+      });
+
       ctx.globalAlpha = 1;
       ctx.shadowBlur = 0;
       animationRef.current = requestAnimationFrame(animate);
@@ -76,6 +127,7 @@ export const CursorTrail = () => {
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('click', handleClick);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
