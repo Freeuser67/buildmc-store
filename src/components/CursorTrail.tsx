@@ -53,6 +53,11 @@ export const CursorTrail = () => {
     window.addEventListener('mousemove', handleMouseMove);
 
     const handleClick = (e: MouseEvent) => {
+      // Only create particles if clicking on non-interactive elements
+      const target = e.target as HTMLElement;
+      const isInteractive = target.closest('a, button, input, select, textarea, [role="button"], [onclick]');
+      if (isInteractive) return;
+
       const particleCount = 20;
       for (let i = 0; i < particleCount; i++) {
         const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.5;
@@ -68,7 +73,7 @@ export const CursorTrail = () => {
         });
       }
     };
-    window.addEventListener('click', handleClick);
+    window.addEventListener('click', handleClick, { passive: true });
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
