@@ -56,8 +56,8 @@ export const CursorTrail = () => {
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
-      // Lava/fire hue range: 0-50 (red to orange to yellow)
-      hueRef.current = ((hueRef.current + 2) % 50);
+      // Blue/cyan hue range: 180-220 (cyan to blue)
+      hueRef.current = 180 + ((hueRef.current + 1) % 40);
       pointsRef.current.push({ x: e.clientX, y: e.clientY, age: 0, hue: hueRef.current });
       if (pointsRef.current.length > 60) {
         pointsRef.current.shift();
