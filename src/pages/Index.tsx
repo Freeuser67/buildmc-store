@@ -7,8 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { ShoppingBag, Shield, Zap, Package, ArrowRight, TrendingUp, Copy, Check } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import { useTheme } from '@/hooks/useTheme';
 import heroImage from '@/assets/hero-minecraft.jpg';
-
+import homeBackground from '@/assets/home-background.webp';
 interface Product {
   id: string;
   name: string;
@@ -38,6 +39,7 @@ interface SiteSetting {
 }
 
 const Index = () => {
+  const { theme } = useTheme();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
@@ -161,7 +163,11 @@ const Index = () => {
       {/* Hero Section */}
       <div className="relative h-[700px] overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="Minecraft server" className="w-full h-full object-cover scale-105 animate-[scale_20s_ease-in-out_infinite]" />
+          <img 
+            src={theme === 'minecraft' ? homeBackground : heroImage} 
+            alt="Minecraft server" 
+            className="w-full h-full object-cover scale-105 animate-[scale_20s_ease-in-out_infinite]" 
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background" />
           <div className="absolute inset-0" style={{ background: 'var(--gradient-hero)' }} />
         </div>
