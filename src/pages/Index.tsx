@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,9 @@ import * as LucideIcons from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import heroImage from '@/assets/hero-minecraft.jpg';
 import homeBackground from '@/assets/home-background.webp';
+import lavaBackground from '@/assets/lava-background.png';
+
+const LavaCube3D = lazy(() => import('@/components/LavaCube3D'));
 interface Product {
   id: string;
   name: string;
@@ -160,50 +163,59 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      {/* Hero Section */}
-      <div className="relative h-[700px] overflow-hidden">
+      {/* Hero Section with 3D Cube */}
+      <div className="relative h-[800px] overflow-hidden">
+        {/* Background */}
         <div className="absolute inset-0">
           <img 
-            src={theme === 'minecraft' ? homeBackground : heroImage} 
+            src={theme === 'minecraft' ? lavaBackground : heroImage} 
             alt="Minecraft server" 
-            className="w-full h-full object-cover scale-105 animate-[scale_20s_ease-in-out_infinite]" 
+            className="w-full h-full object-cover scale-110" 
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background" />
-          <div className="absolute inset-0" style={{ background: 'var(--gradient-hero)' }} />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/50 to-background" />
           {theme === 'minecraft' && (
             <>
-              <div className="absolute inset-0 bg-gradient-to-t from-orange-600/20 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-orange-500/30 via-red-500/10 to-transparent blur-xl" />
+              <div className="absolute inset-0 bg-gradient-to-t from-orange-600/30 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-orange-500/40 via-red-500/20 to-transparent blur-2xl" />
               <div className="absolute inset-0 animate-pulse" style={{ 
-                background: 'radial-gradient(ellipse at bottom, rgba(255,100,0,0.15) 0%, transparent 60%)',
-                animationDuration: '4s'
+                background: 'radial-gradient(ellipse at bottom, rgba(255,100,0,0.25) 0%, transparent 70%)',
+                animationDuration: '3s'
               }} />
             </>
           )}
         </div>
-        <div className="relative container mx-auto px-4 h-full flex items-center">
-          <div className="max-w-3xl animate-fade-in">
-            <div className="inline-block mb-4 px-4 py-2 bg-primary/10 border border-primary/30 rounded-full">
-              <span className="text-primary font-semibold text-sm">🎮 Premium Minecraft Store</span>
+
+        {/* 3D Cube - Only in minecraft theme */}
+        {theme === 'minecraft' && (
+          <Suspense fallback={null}>
+            <LavaCube3D />
+          </Suspense>
+        )}
+
+        {/* Content */}
+        <div className="relative container mx-auto px-4 h-full flex items-center z-20">
+          <div className="max-w-2xl animate-fade-in">
+            <div className="inline-block mb-4 px-4 py-2 bg-orange-500/20 border border-orange-500/40 rounded-full backdrop-blur-sm">
+              <span className="text-orange-400 font-semibold text-sm">🔥 Premium Minecraft Store</span>
             </div>
-            <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-primary via-primary-glow to-secondary bg-clip-text text-transparent">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+              <span className="bg-gradient-to-r from-orange-400 via-red-500 to-yellow-500 bg-clip-text text-transparent drop-shadow-lg">
                 {siteSettings['hero_greeting'] || 'Welcome to'}
               </span>
               <br />
-              <span className="text-foreground">{siteSettings['hero_title'] || 'BuildMC Store'}</span>
+              <span className="text-foreground drop-shadow-lg">{siteSettings['hero_title'] || 'BuildMC Store'}</span>
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed">
+            <p className="text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed backdrop-blur-sm bg-background/20 p-4 rounded-xl">
               {siteSettings['hero_subtitle'] || 'Your trusted destination for premium ranks, exclusive items, and epic Minecraft experiences!'}
             </p>
             <div className="flex flex-wrap gap-4">
-              <Button asChild size="lg" className="gap-2 text-base px-8 py-6 shadow-lg hover:shadow-xl transition-all glow-effect">
+              <Button asChild size="lg" className="gap-2 text-base px-8 py-6 shadow-lg hover:shadow-orange-500/25 transition-all bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 border-none">
                 <Link to="/shop">
                   <ShoppingBag className="w-5 h-5" />
                   Browse Shop
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="gap-2 text-base px-8 py-6 border-2">
+              <Button asChild size="lg" variant="outline" className="gap-2 text-base px-8 py-6 border-2 border-orange-500/50 text-orange-400 hover:bg-orange-500/20 backdrop-blur-sm">
                 <Link to="/orders">
                   View Orders
                 </Link>
@@ -212,8 +224,8 @@ const Index = () => {
           </div>
         </div>
         
-        {/* Floating particles effect */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+        {/* Bottom gradient */}
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none z-10" />
       </div>
 
       {/* Server Info Section */}
