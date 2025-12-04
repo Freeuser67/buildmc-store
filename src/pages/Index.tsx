@@ -170,6 +170,16 @@ const Index = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background" />
           <div className="absolute inset-0" style={{ background: 'var(--gradient-hero)' }} />
+          {theme === 'minecraft' && (
+            <>
+              <div className="absolute inset-0 bg-gradient-to-t from-orange-600/20 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-orange-500/30 via-red-500/10 to-transparent blur-xl" />
+              <div className="absolute inset-0 animate-pulse" style={{ 
+                background: 'radial-gradient(ellipse at bottom, rgba(255,100,0,0.15) 0%, transparent 60%)',
+                animationDuration: '4s'
+              }} />
+            </>
+          )}
         </div>
         <div className="relative container mx-auto px-4 h-full flex items-center">
           <div className="max-w-3xl animate-fade-in">
