@@ -209,23 +209,21 @@ const Index = () => {
           </Suspense>
         )}
 
-        {/* Ghost Cursor Effect */}
-        {theme === 'minecraft' && (
-          <GhostCursor
-            color="#00d4ff"
-            brightness={1.2}
-            edgeIntensity={0}
-            trailLength={50}
-            inertia={0.5}
-            grainIntensity={0.03}
-            bloomStrength={0.15}
-            bloomRadius={1.0}
-            bloomThreshold={0.02}
-            fadeDelayMs={1000}
-            fadeDurationMs={1500}
-            zIndex={15}
-          />
-        )}
+        {/* Ghost Cursor Effect - Always visible */}
+        <GhostCursor
+          color={theme === 'minecraft' ? "#00d4ff" : "#B19EEF"}
+          brightness={1.2}
+          edgeIntensity={0}
+          trailLength={50}
+          inertia={0.5}
+          grainIntensity={0.03}
+          bloomStrength={0.15}
+          bloomRadius={1.0}
+          bloomThreshold={0.02}
+          fadeDelayMs={1000}
+          fadeDurationMs={1500}
+          zIndex={15}
+        />
 
         {/* Content */}
         <div className="relative container mx-auto px-4 h-full flex items-center z-20">
