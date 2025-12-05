@@ -212,16 +212,8 @@ const Index = () => {
         {/* Ghost Cursor Effect - Always visible */}
         <GhostCursor
           color={theme === 'minecraft' ? "#00d4ff" : "#B19EEF"}
-          brightness={1.2}
-          edgeIntensity={0}
-          trailLength={50}
-          inertia={0.5}
-          grainIntensity={0.03}
-          bloomStrength={0.15}
-          bloomRadius={1.0}
-          bloomThreshold={0.02}
-          fadeDelayMs={1000}
-          fadeDurationMs={1500}
+          trailLength={25}
+          size={25}
           zIndex={15}
         />
 
