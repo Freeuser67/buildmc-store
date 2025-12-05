@@ -11,6 +11,7 @@ import { useTheme } from '@/hooks/useTheme';
 import heroImage from '@/assets/hero-minecraft.jpg';
 import homeBackground from '@/assets/home-background.webp';
 import lavaBackground from '@/assets/lava-background.png';
+import GhostCursor from '@/components/GhostCursor';
 
 const LavaCube3D = lazy(() => import('@/components/LavaCube3D'));
 interface Product {
@@ -206,6 +207,24 @@ const Index = () => {
           <Suspense fallback={null}>
             <LavaCube3D />
           </Suspense>
+        )}
+
+        {/* Ghost Cursor Effect */}
+        {theme === 'minecraft' && (
+          <GhostCursor
+            color="#00d4ff"
+            brightness={1.2}
+            edgeIntensity={0}
+            trailLength={50}
+            inertia={0.5}
+            grainIntensity={0.03}
+            bloomStrength={0.15}
+            bloomRadius={1.0}
+            bloomThreshold={0.02}
+            fadeDelayMs={1000}
+            fadeDurationMs={1500}
+            zIndex={15}
+          />
         )}
 
         {/* Content */}
