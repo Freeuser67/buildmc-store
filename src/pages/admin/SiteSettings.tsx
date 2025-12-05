@@ -10,6 +10,7 @@ import { Save } from "lucide-react";
 import { ServerInfoSection } from "@/components/admin/ServerInfoSection";
 import { QuickLinksSection } from "@/components/admin/QuickLinksSection";
 import { CommunityStatsSection } from "@/components/admin/CommunityStatsSection";
+import { LogoUploadSection } from "@/components/admin/LogoUploadSection";
 
 interface QuickLink {
   id: string;
@@ -38,6 +39,9 @@ const SiteSettings = () => {
   const [serverIp, setServerIp] = useState("");
   const [serverVersion, setServerVersion] = useState("");
   const [discordServerId, setDiscordServerId] = useState("");
+  
+  // Website Logo
+  const [websiteLogo, setWebsiteLogo] = useState("");
   
   // Additional fields for Shop page
   const [activePlayers, setActivePlayers] = useState("");
@@ -79,6 +83,7 @@ const SiteSettings = () => {
       setServerIp(settingsMap.server_ip || "");
       setServerVersion(settingsMap.server_version || "");
       setDiscordServerId(settingsMap.discord_server_id || "");
+      setWebsiteLogo(settingsMap.website_logo || "");
 
       // Shop stats fields
       setActivePlayers(settingsMap.active_players || "");
@@ -240,6 +245,11 @@ const SiteSettings = () => {
         <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
           Site Settings
         </h1>
+
+        <LogoUploadSection
+          currentLogo={websiteLogo}
+          onLogoChange={setWebsiteLogo}
+        />
 
         <ServerInfoSection
           serverIp={serverIp}
