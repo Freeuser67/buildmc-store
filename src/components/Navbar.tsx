@@ -3,18 +3,52 @@ import { ShoppingCart, User, LogOut, Shield, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export const Navbar = () => {
   const { user, isAdmin, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      const { data } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'website_logo')
+        .maybeSingle();
+      
+      if (data?.setting_value) {
+        setLogoUrl(data.setting_value);
+      }
+    };
+
+    fetchLogo();
+
+    const channel = supabase
+      .channel('navbar-logo')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, () => {
+        fetchLogo();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   return (
     <nav className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-50 shadow-lg">
       <div className="container mx-auto px-4 py-5 flex items-center justify-between">
         <Link to="/" className="group flex items-center gap-2 transition-all">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow glow-effect">
-            <span className="text-2xl font-black text-primary-foreground">B</span>
-          </div>
+          {logoUrl ? (
+            <img src={logoUrl} alt="Logo" className="w-10 h-10 rounded-xl object-contain" />
+          ) : (
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow glow-effect">
+              <span className="text-2xl font-black text-primary-foreground">B</span>
+            </div>
+          )}
           <span className="text-2xl font-bold bg-gradient-to-r from-primary via-primary-glow to-secondary bg-clip-text text-transparent">
             BuildMC Store
           </span>
