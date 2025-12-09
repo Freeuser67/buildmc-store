@@ -11,6 +11,7 @@ import heroImage from '@/assets/hero-minecraft.jpg';
 import { ShoppingCart, Package, Copy, Check, Users, Trophy, Sparkles, Youtube, MessageCircle, Server } from 'lucide-react';
 import { toast } from 'sonner';
 import { ProductCardSkeleton } from '@/components/LoadingSkeleton';
+import MouseSparkle from '@/components/MouseSparkle';
 interface Category {
   id: string;
   name: string;
@@ -233,6 +234,7 @@ const Shop = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <MouseSparkle />
       <Navbar />
       
       {/* Hero Section */}
