@@ -11,7 +11,6 @@ import { useTheme } from '@/hooks/useTheme';
 import heroImage from '@/assets/hero-minecraft.jpg';
 import homeBackground from '@/assets/home-background.webp';
 import lavaBackground from '@/assets/lava-background.png';
-import StarCursor from '@/components/StarCursor';
 
 const LavaCube3D = lazy(() => import('@/components/LavaCube3D'));
 interface Product {
@@ -208,9 +207,6 @@ const Index = () => {
             <LavaCube3D />
           </Suspense>
         )}
-
-        {/* Star Cursor Effect */}
-        <StarCursor />
 
         {/* Content */}
         <div className="relative container mx-auto px-4 h-full flex items-center z-20">
