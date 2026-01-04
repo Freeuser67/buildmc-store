@@ -1,5 +1,6 @@
 import { Youtube, MessageCircle, Users, Trophy, Sparkles } from 'lucide-react';
 import { QuickLink } from '@/hooks/useQuickLinks';
+import { toExternalUrl } from '@/lib/utils';
 
 interface ShopFooterProps {
   quickLinks: QuickLink[];
@@ -18,6 +19,9 @@ export const ShopFooter = ({
   eventsHosted,
   uptime
 }: ShopFooterProps) => {
+  const safeDiscordUrl = toExternalUrl(discordUrl);
+  const safeYoutubeUrl = toExternalUrl(youtubeUrl);
+
   return (
     <footer className="relative border-t border-border/50 py-16 bg-gradient-to-b from-background to-card/30">
       <div className="container mx-auto px-4">
@@ -49,11 +53,11 @@ export const ShopFooter = ({
                       {link.quick_text || link.title}
                     </p>
                   ) : (
-                    <a 
-                      key={link.id} 
-                      href={link.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
+                    <a
+                      key={link.id}
+                      href={toExternalUrl(link.url)}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="block text-muted-foreground hover:text-primary transition-colors font-medium"
                     >
                       {link.title}
@@ -87,19 +91,19 @@ export const ShopFooter = ({
 
           {/* Social Links */}
           <div className="flex flex-wrap justify-center gap-6 pt-8 border-t border-border/50">
-            <a 
-              href={discordUrl} 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href={safeDiscordUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="glass-effect rounded-2xl px-8 py-4 flex items-center gap-3 hover:neon-border hover:scale-105 transition-all group"
             >
               <MessageCircle className="w-6 h-6 text-[#5865F2] group-hover:scale-110 transition-transform" />
               <span className="font-bold text-foreground">Join Discord</span>
             </a>
-            <a 
-              href={youtubeUrl} 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href={safeYoutubeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="glass-effect rounded-2xl px-8 py-4 flex items-center gap-3 hover:neon-border hover:scale-105 transition-all group"
             >
               <Youtube className="w-6 h-6 text-[#FF0000] group-hover:scale-110 transition-transform" />

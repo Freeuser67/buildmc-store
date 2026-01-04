@@ -26,6 +26,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Shop />} />
+            <Route path="/shop" element={<Shop />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/checkout/:productId" element={<Checkout />} />
             <Route path="/orders" element={<Orders />} />
