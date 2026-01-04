@@ -45,7 +45,7 @@ const Shop = () => {
       <ShopFooter
         quickLinks={quickLinks}
         discordUrl={settings['discord_url'] || 'https://discord.gg/buildmc'}
-        youtubeUrl={settings['youtube_url'] || 'https://youtube.com/@buildmc'}
+        youtubeUrl={settings['youtube_url'] || 'https://www.youtube.com/@buildmc'}
         activePlayers={settings['active_players'] || '15K+'}
         eventsHosted={settings['events_hosted'] || '500+'}
         uptime={settings['uptime'] || '24/7'}
