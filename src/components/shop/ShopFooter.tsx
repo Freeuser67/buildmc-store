@@ -9,6 +9,7 @@ interface ShopFooterProps {
   activePlayers: string;
   eventsHosted: string;
   uptime: string;
+  websiteLogo?: string;
 }
 
 export const ShopFooter = ({
@@ -17,7 +18,8 @@ export const ShopFooter = ({
   youtubeUrl,
   activePlayers,
   eventsHosted,
-  uptime
+  uptime,
+  websiteLogo
 }: ShopFooterProps) => {
   const safeDiscordUrl = toExternalUrl(discordUrl);
   const safeYoutubeUrl = toExternalUrl(youtubeUrl);
@@ -30,9 +32,17 @@ export const ShopFooter = ({
             {/* Brand */}
             <div className="space-y-6">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary via-accent to-secondary flex items-center justify-center glow-effect">
-                  <Sparkles className="w-8 h-8 text-primary-foreground" />
-                </div>
+                {websiteLogo ? (
+                  <img 
+                    src={websiteLogo} 
+                    alt="BuildMC Logo" 
+                    className="w-16 h-16 rounded-2xl object-cover glow-effect"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary via-accent to-secondary flex items-center justify-center glow-effect">
+                    <Sparkles className="w-8 h-8 text-primary-foreground" />
+                  </div>
+                )}
                 <div>
                   <h3 className="text-3xl font-black bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">BuildMC</h3>
                   <p className="text-muted-foreground font-medium">Premium Minecraft Store</p>
