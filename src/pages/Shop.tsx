@@ -49,6 +49,7 @@ const Shop = () => {
         activePlayers={settings['active_players'] || '15K+'}
         eventsHosted={settings['events_hosted'] || '500+'}
         uptime={settings['uptime'] || '24/7'}
+        websiteLogo={settings['website_logo']}
       />
     </div>
   );
