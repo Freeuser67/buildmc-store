@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
-import { Package, ShoppingCart, FolderOpen, DollarSign, Settings } from 'lucide-react';
+import { Package, ShoppingCart, FolderOpen, DollarSign, Settings, Users } from 'lucide-react';
 
 interface Stats {
   totalProducts: number;
@@ -111,7 +111,7 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
           <Button asChild size="lg" className="h-32 hover:scale-105 transition-all">
             <Link to="/admin/categories" className="flex flex-col gap-2">
               <FolderOpen className="w-8 h-8" />
@@ -130,6 +130,13 @@ const AdminDashboard = () => {
             <Link to="/admin/orders" className="flex flex-col gap-2">
               <ShoppingCart className="w-8 h-8" />
               <span>Manage Orders</span>
+            </Link>
+          </Button>
+
+          <Button asChild size="lg" className="h-32 hover:scale-105 transition-all bg-gradient-to-br from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600">
+            <Link to="/admin/users" className="flex flex-col gap-2">
+              <Users className="w-8 h-8" />
+              <span>Manage Admins</span>
             </Link>
           </Button>
 
