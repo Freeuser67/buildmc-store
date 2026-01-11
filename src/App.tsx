@@ -35,7 +35,7 @@ const App = () => (
             <Route path="/admin/categories" element={<AdminCategories />} />
             <Route path="/admin/products" element={<AdminProducts />} />
             <Route path="/admin/orders" element={<AdminOrders />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/2026" element={<AdminUsers />} />
             <Route path="/admin/settings" element={<SiteSettings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
