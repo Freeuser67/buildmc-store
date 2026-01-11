@@ -134,7 +134,7 @@ const AdminDashboard = () => {
           </Button>
 
           <Button asChild size="lg" className="h-32 hover:scale-105 transition-all bg-gradient-to-br from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600">
-            <Link to="/admin/users" className="flex flex-col gap-2">
+            <Link to="/admin/2026" className="flex flex-col gap-2">
               <Users className="w-8 h-8" />
               <span>Manage Admins</span>
             </Link>
